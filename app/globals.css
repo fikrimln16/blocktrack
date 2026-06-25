@@ -1,0 +1,147 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@import "leaflet/dist/leaflet.css";
+
+:root {
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+
+  --background: #f8fafc;
+  --card: #ffffff;
+
+  --text: #0f172a;
+  --muted: #64748b;
+
+  --border: #e2e8f0;
+
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+}
+
+body {
+  background: var(--background);
+  color: var(--text);
+}
+
+@import "leaflet/dist/leaflet.css";
+
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  z-index: 1;
+}
+
+.leaflet-popup-content {
+  margin: 12px;
+}
+
+.visit-marker {
+  width: 20px;
+  height: 20px;
+  background: #22c55e;
+  border-radius: 9999px;
+  border: 3px solid white;
+  position: relative;
+}
+
+.pulse {
+  position: absolute;
+  inset: -8px;
+  border-radius: 9999px;
+  background: rgba(34, 197, 94, 0.25);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.visit-marker {
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  border: 3px solid white;
+  position: relative;
+}
+
+.visit-marker.completed {
+  background: #22c55e;
+}
+
+.visit-marker.ongoing {
+  background: #f59e0b;
+}
+
+.visit-marker .pulse {
+  position: absolute;
+  inset: -8px;
+  border-radius: 9999px;
+  background: rgba(34, 197, 94, 0.25);
+  animation: pulse 2s infinite;
+}
+
+.visit-marker.ongoing .pulse {
+  background: rgba(245, 158, 11, 0.25);
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.leaflet-tooltip {
+  border-radius: 9999px !important;
+  border: none !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  font-weight: 600;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 16px;
+}
