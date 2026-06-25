@@ -2,6 +2,7 @@
 
 import { Block } from "@/types/block";
 import { BlockCard } from "./block-card";
+import { useEffect, useRef } from "react";
 
 interface Props {
   loading: boolean;
@@ -14,6 +15,17 @@ interface Props {
 }
 
 export function BlockList({ loading, blocks, selectedBlock, onSelect }: Props) {
+  const refs = useRef<Record<number, HTMLDivElement | null>>({});
+
+  useEffect(() => {
+    if (!selectedBlock) return;
+
+    refs.current[selectedBlock.id]?.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+  }, [selectedBlock]);
+
   if (loading) {
     return (
       <div className="rounded-[28px] border border-slate-200 bg-white p-10 text-center">
@@ -33,12 +45,18 @@ export function BlockList({ loading, blocks, selectedBlock, onSelect }: Props) {
   return (
     <div className="space-y-4">
       {blocks.map((block) => (
-        <BlockCard
+        <div
           key={block.id}
-          block={block}
-          active={selectedBlock?.id === block.id}
-          onClick={() => onSelect(block)}
-        />
+          ref={(el) => {
+            refs.current[block.id] = el;
+          }}
+        >
+          <BlockCard
+            block={block}
+            active={selectedBlock?.id === block.id}
+            onClick={() => onSelect(block)}
+          />
+        </div>
       ))}
     </div>
   );

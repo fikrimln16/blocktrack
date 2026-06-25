@@ -1,31 +1,39 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 import {
-  getAmaOptions,
-  getBlockSummary,
   getBlocks,
+  getBlockSummary,
+  getAmaOptions,
   getEstateOptions,
 } from "@/services/block.service";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const blocks = await getBlocks();
+    const { searchParams } = new URL(req.url);
 
-    const summary = await getBlockSummary();
+    const filters = {
+      search: searchParams.get("search") ?? "",
+      ama: Number(searchParams.get("ama")) || undefined,
+      estate: Number(searchParams.get("estate")) || undefined,
+      division: Number(searchParams.get("division")) || undefined,
+      status: searchParams.get("status") ?? "",
+      page: Number(searchParams.get("page")) || 1,
+      limit: Number(searchParams.get("limit")) || 100,
+    };
 
-    const amas = await getAmaOptions();
-
-    const estates = await getEstateOptions();
+    const [blocks, summary, amas, estates] = await Promise.all([
+      getBlocks(filters),
+      getBlockSummary(),
+      getAmaOptions(),
+      getEstateOptions(filters.ama),
+    ]);
 
     return NextResponse.json({
       success: true,
-
+      filters,
       summary,
-
       amas,
-
       estates,
-
       blocks,
     });
   } catch (error) {
@@ -34,8 +42,7 @@ export async function GET() {
     return NextResponse.json(
       {
         success: false,
-
-        message: "Failed to load block data",
+        message: "Internal Server Error",
       },
       {
         status: 500,

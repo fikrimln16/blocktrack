@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 
@@ -23,9 +23,19 @@ interface Summary {
 }
 
 export default function BlocksPage() {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const [blocks, setBlocks] = useState<Block[]>([]);
+
+  const [selectedBlock, setSelectedBlock] = useState<Block | null>(null);
+
+  const [amaId, setAmaId] = useState("");
+  const [estateId, setEstateId] = useState("");
+  const [status, setStatus] = useState("");
+  const [division, setDivision] = useState("");
+
+  const [page, setPage] = useState(1);
+  const limit = 100;
 
   const [summary, setSummary] = useState<Summary>({
     totalAma: 0,
@@ -35,61 +45,68 @@ export default function BlocksPage() {
   });
 
   const [amas, setAmas] = useState<any[]>([]);
-
   const [estates, setEstates] = useState<any[]>([]);
 
-  const [selectedBlock, setSelectedBlock] = useState<Block | null>(null);
-
+  const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
-  const [amaId, setAmaId] = useState("");
-  const [estateId, setEstateId] = useState("");
-  const [status, setStatus] = useState("");
-  const [division, setDivision] = useState("");
 
-  useEffect(() => {
-    loadBlocks();
-  }, []);
-
-  async function loadBlocks() {
+  const loadBlocks = useCallback(async () => {
     try {
-      const res = await fetch("/api/blocks");
+      setLoading(true);
+
+      const params = new URLSearchParams();
+
+      if (search) params.set("search", search);
+      if (amaId) params.set("ama", amaId);
+      if (estateId) params.set("estate", estateId);
+      if (division) params.set("division", division);
+      if (status) params.set("status", status);
+
+      params.set("page", String(page));
+      params.set("limit", String(limit));
+
+      const res = await fetch(`/api/blocks?${params.toString()}`, {
+        cache: "no-store",
+      });
 
       const json = await res.json();
 
       setBlocks(json.blocks);
 
+      if (json.blocks.length > 0) {
+        if (
+          !selectedBlock ||
+          !json.blocks.some((b: Block) => b.id === selectedBlock.id)
+        ) {
+          setSelectedBlock(json.blocks[0]);
+        }
+      } else {
+        setSelectedBlock(null);
+      }
+
       setSummary(json.summary);
-
       setAmas(json.amas);
-
       setEstates(json.estates);
-    } catch (err) {
-      console.error(err);
     } finally {
       setLoading(false);
     }
-  }
+  }, [search, amaId, estateId, division, status, page]);
 
-  const filteredBlocks = blocks.filter((block) => {
-    const matchSearch =
-      !search ||
-      block.block_code.toLowerCase().includes(search.toLowerCase()) ||
-      (block.block_name ?? "").toLowerCase().includes(search.toLowerCase());
+  useEffect(() => {
+    loadBlocks();
+  }, [loadBlocks]);
 
-    const matchAma = !amaId || block.ama_id === Number(amaId);
+  useEffect(() => {
+    setPage(1);
+  }, [search, amaId, estateId, division, status]);
 
-    const matchEstate = !estateId || block.estate_id === Number(estateId);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearch(searchInput);
+    }, 400);
 
-    const matchStatus = !status || block.status === status;
-
-    const matchDivision = !division || block.division === Number(division);
-
-    return (
-      matchSearch && matchAma && matchEstate && matchStatus && matchDivision
-    );
-  });
-
-  console.log(filteredBlocks);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   return (
     <DashboardLayout>
@@ -146,22 +163,25 @@ export default function BlocksPage() {
         <BlockFilter
           amas={amas}
           estates={estates}
-          search={search}
+          search={searchInput}
           amaId={amaId}
           estateId={estateId}
           status={status}
           division={division}
-          onSearch={setSearch}
+          onSearch={setSearchInput}
           onAma={setAmaId}
           onEstate={setEstateId}
           onStatus={setStatus}
           onDivision={setDivision}
           onReset={() => {
+            setSearchInput("");
             setSearch("");
             setAmaId("");
             setEstateId("");
             setStatus("");
             setDivision("");
+            setPage(1);
+            setSelectedBlock(null);
           }}
         />
 
@@ -173,7 +193,7 @@ export default function BlocksPage() {
           <div className="xl:col-span-4">
             <BlockList
               loading={loading}
-              blocks={filteredBlocks}
+              blocks={blocks}
               selectedBlock={selectedBlock}
               onSelect={setSelectedBlock}
             />
@@ -183,7 +203,7 @@ export default function BlocksPage() {
 
           <div className="xl:col-span-8">
             <BlockMap
-              blocks={filteredBlocks}
+              blocks={blocks}
               selectedBlock={selectedBlock}
               onSelect={setSelectedBlock}
             />

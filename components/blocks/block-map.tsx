@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { Map } from "lucide-react";
 
 import { Block } from "@/types/block";
+import { SelectionInfo } from "./selection-info";
 
 const BlockLeafletMap = dynamic(
   () => import("./block-map-leaflet").then((mod) => mod.BlockLeafletMap),
@@ -33,7 +34,9 @@ export function BlockMap({ blocks, selectedBlock, onSelect }: Props) {
         </p>
       </div>
 
-      <div className="h-[650px]">
+      <div className="relative h-[650px]">
+        <SelectionInfo block={selectedBlock} />
+
         <BlockLeafletMap
           blocks={blocks}
           selectedBlock={selectedBlock}

@@ -15,17 +15,30 @@ export function BlockCard({ block, active, onClick }: Props) {
     <button
       onClick={onClick}
       className={`
-        w-full
-        rounded-2xl
-        border
-        p-5
-        text-left
-        transition-all
-        hover:-translate-y-1
-        hover:shadow-lg
+         w-full
+         rounded-2xl
+         border
+         p-5
+         text-left
+         transition-all
+         duration-300
 
-        ${active ? "border-blue-600 bg-blue-50" : "border-slate-200 bg-white"}
-      `}
+         ${
+           active
+             ? `
+               border-blue-500
+               bg-blue-50
+               ring-2
+               ring-blue-200
+               shadow-xl
+            `
+             : `
+               border-slate-200
+               bg-white
+               hover:shadow-lg
+            `
+         }
+         `}
     >
       <div className="flex items-center justify-between">
         <div>
