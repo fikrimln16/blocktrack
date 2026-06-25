@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
       limit: Number(searchParams.get("limit")) || 100,
     };
 
-    const [blocks, summary, amas, estates] = await Promise.all([
+    const [result, summary, amas, estates] = await Promise.all([
       getBlocks(filters),
       getBlockSummary(),
       getAmaOptions(),
@@ -30,11 +30,17 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      filters,
+
       summary,
+
       amas,
       estates,
-      blocks,
+
+      blocks: result.blocks,
+      total: result.total,
+      page: result.page,
+      limit: result.limit,
+      totalPages: result.totalPages,
     });
   } catch (error) {
     console.error(error);

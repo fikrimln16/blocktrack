@@ -2,7 +2,14 @@
 
 import { useEffect, useMemo, useRef } from "react";
 
-import { GeoJSON, MapContainer, Popup, TileLayer, useMap } from "react-leaflet";
+import {
+  GeoJSON,
+  MapContainer,
+  Popup,
+  TileLayer,
+  useMap,
+  LayersControl,
+} from "react-leaflet";
 
 import L from "leaflet";
 

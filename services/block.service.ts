@@ -151,15 +151,86 @@ export async function getBlocks(filters: BlockFilter = {}) {
   params.push(limit);
   params.push(offset);
 
+  // ===============================
+  // Total Data
+  // ===============================
+
+  let countSql = `
+SELECT COUNT(*) AS total
+
+FROM blocks b
+
+INNER JOIN estates e
+ON e.id = b.estate_id
+
+INNER JOIN amas a
+ON a.id = e.ama_id
+
+WHERE 1=1
+`;
+
+  const countParams: any[] = [];
+
+  // Search
+  if (search.trim() !== "") {
+    countSql += `
+    AND (
+      b.block_code LIKE ?
+      OR b.block_name LIKE ?
+    )
+  `;
+
+    countParams.push(`%${search}%`);
+    countParams.push(`%${search}%`);
+  }
+
+  // AMA
+  if (ama) {
+    countSql += ` AND e.ama_id=? `;
+    countParams.push(ama);
+  }
+
+  // Estate
+  if (estate) {
+    countSql += ` AND b.estate_id=? `;
+    countParams.push(estate);
+  }
+
+  // Division
+  if (division) {
+    countSql += ` AND b.division=? `;
+    countParams.push(division);
+  }
+
+  // Status
+  if (status) {
+    countSql += ` AND b.status=? `;
+    countParams.push(status);
+  }
+
+  const [[countRow]]: any = await db.query(countSql, countParams);
+
   const [rows] = await db.query(sql, params);
 
-  return (rows as any[]).map((row) => ({
+  const blocks = (rows as any[]).map((row) => ({
     ...row,
     geometry:
       typeof row.geometry === "string"
         ? JSON.parse(row.geometry)
         : row.geometry,
-  })) as Block[];
+  }));
+
+  return {
+    blocks,
+
+    total: countRow.total,
+
+    page,
+
+    limit,
+
+    totalPages: Math.ceil(countRow.total / limit),
+  };
 }
 
 export async function getBlockSummary() {

@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 
 import { BlockSummary } from "@/components/blocks/block-summary";
 import { BlockFilter } from "@/components/blocks/block-filter";
-import { BlockList } from "@/components/blocks/block-list";
+import { BlockTable } from "@/components/blocks/block-table";
 import { BlockMap } from "@/components/blocks/block-map";
 
 import { Block } from "@/types/block";
@@ -14,6 +14,8 @@ import { Block } from "@/types/block";
 import Link from "next/link";
 
 import { ChevronRight, Download, Map } from "lucide-react";
+
+import { BlockPagination } from "@/components/blocks/block-pagination";
 
 interface Summary {
   totalAma: number;
@@ -24,6 +26,7 @@ interface Summary {
 
 export default function BlocksPage() {
   const [loading, setLoading] = useState(false);
+  const mapSectionRef = useRef<HTMLDivElement>(null);
 
   const [blocks, setBlocks] = useState<Block[]>([]);
 
@@ -50,6 +53,19 @@ export default function BlocksPage() {
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
 
+  const [total, setTotal] = useState(0);
+
+  const [totalPages, setTotalPages] = useState(1);
+
+  const handleSelectBlock = (block: Block) => {
+    setSelectedBlock(block);
+
+    mapSectionRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
+
   const loadBlocks = useCallback(async () => {
     try {
       setLoading(true);
@@ -72,6 +88,10 @@ export default function BlocksPage() {
       const json = await res.json();
 
       setBlocks(json.blocks);
+
+      setTotal(json.total);
+
+      setTotalPages(json.totalPages);
 
       if (json.blocks.length > 0) {
         if (
@@ -111,8 +131,7 @@ export default function BlocksPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* Breadcrumb */}
-
+        {/* Header */}
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <div className="flex items-center gap-2 text-sm text-slate-500">
@@ -136,18 +155,18 @@ export default function BlocksPage() {
 
           <button
             className="
-              inline-flex
-              items-center
-              gap-2
-              rounded-2xl
-              bg-blue-600
-              px-5
-              py-3
-              font-medium
-              text-white
-              transition
-              hover:bg-blue-700
-            "
+            inline-flex
+            items-center
+            gap-2
+            rounded-2xl
+            bg-blue-600
+            px-5
+            py-3
+            font-medium
+            text-white
+            transition
+            hover:bg-blue-700
+          "
           >
             <Download size={18} />
             Export
@@ -155,11 +174,9 @@ export default function BlocksPage() {
         </div>
 
         {/* Summary */}
-
         <BlockSummary summary={summary} />
 
         {/* Filter */}
-
         <BlockFilter
           amas={amas}
           estates={estates}
@@ -185,27 +202,42 @@ export default function BlocksPage() {
           }}
         />
 
-        {/* Content */}
+        {/* ========================= */}
+        {/* MAP */}
+        {/* ========================= */}
 
-        <div className="grid gap-6 xl:grid-cols-12">
-          {/* List */}
-
-          <div className="xl:col-span-4">
-            <BlockList
-              loading={loading}
-              blocks={blocks}
-              selectedBlock={selectedBlock}
-              onSelect={setSelectedBlock}
-            />
-          </div>
-
-          {/* Map */}
-
-          <div className="xl:col-span-8">
+        <div
+          ref={mapSectionRef}
+          className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
+        >
+          <div className="h-[650px]">
             <BlockMap
               blocks={blocks}
               selectedBlock={selectedBlock}
-              onSelect={setSelectedBlock}
+              onSelect={handleSelectBlock}
+            />
+          </div>
+        </div>
+
+        {/* ========================= */}
+        {/* TABLE */}
+        {/* ========================= */}
+
+        <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+          <BlockTable
+            loading={loading}
+            blocks={blocks}
+            selectedBlock={selectedBlock}
+            onSelect={handleSelectBlock}
+          />
+
+          <div className="border-t border-slate-200 bg-slate-50 p-4">
+            <BlockPagination
+              page={page}
+              totalPages={totalPages}
+              total={total}
+              limit={limit}
+              onPageChange={setPage}
             />
           </div>
         </div>
