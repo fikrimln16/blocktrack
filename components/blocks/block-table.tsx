@@ -21,7 +21,8 @@ type SortField =
   | "area_ha"
   | "planting_year"
   | "total_visit"
-  | "status";
+  | "status"
+  | "detail";
 
 type SortDirection = "asc" | "desc";
 
@@ -160,6 +161,8 @@ export function BlockTable({
               <Header title="Visit" field="total_visit" align="center" />
 
               <Header title="Status" field="status" />
+
+              <Header title="detail" field="detail" />
             </tr>
           </thead>
 

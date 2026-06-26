@@ -2,6 +2,7 @@
 
 import { Block } from "@/types/block";
 import { BlockStatusBadge } from "./block-status-badge";
+import Link from "next/link";
 
 interface Props {
   index: number;
@@ -94,6 +95,19 @@ export function BlockTableRow({ index, block, active, onClick }: Props) {
       {/* Status */}
       <td onClick={onClick} className="cursor-pointer px-4 py-4">
         <BlockStatusBadge status={block.status} />
+      </td>
+
+      {/* Detail */}
+      <td className="px-4 py-4">
+        <Link href={`/blocks/${block.id}`} className="block">
+          <div className="space-y-1">
+            <p className="font-semibold text-slate-900 hover:text-blue-600">
+              {block.block_code}
+            </p>
+
+            <p className="text-xs text-slate-500">{block.block_name || "-"}</p>
+          </div>
+        </Link>
       </td>
     </>
   );

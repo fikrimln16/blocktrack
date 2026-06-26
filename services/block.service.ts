@@ -342,3 +342,31 @@ export async function getBlockById(id: number) {
 
   return row;
 }
+
+export async function getBlockVisits(blockId: number) {
+  const [rows] = await db.query(
+    `
+    SELECT
+      v.id,
+      v.visit_date,
+      v.visit_type,
+      v.status,
+      u.name AS inspector,
+      COUNT(DISTINCT p.id) AS photos,
+      COUNT(DISTINCT f.id) AS findings
+    FROM visits v
+    LEFT JOIN users u
+      ON u.id = v.user_id
+    LEFT JOIN visit_photos p
+      ON p.visit_id = v.id
+    LEFT JOIN findings f
+      ON f.visit_id = v.id
+    WHERE v.block_id = ?
+    GROUP BY v.id
+    ORDER BY v.visit_date DESC
+    `,
+    [blockId],
+  );
+
+  return rows;
+}
