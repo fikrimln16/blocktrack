@@ -1,3 +1,8 @@
+export interface VisitPhoto {
+  id: number;
+  photo_url: string;
+}
+
 export interface Visit {
   id: number;
 
@@ -20,4 +25,6 @@ export interface Visit {
   total_photos: number;
 
   total_findings: number;
+
+  photos?: VisitPhoto[];
 }

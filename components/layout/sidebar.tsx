@@ -26,46 +26,46 @@ const menus = [
     href: "/dashboard",
     icon: LayoutDashboard,
   },
-  {
-    title: "Live Monitoring",
-    href: "/monitoring",
-    icon: Map,
-  },
-  {
-    title: "Visit History",
-    href: "/visits",
-    icon: History,
-  },
-  {
-    title: "AMA",
-    href: "/amas",
-    icon: Trees,
-  },
-  {
-    title: "Estate",
-    href: "/estates",
-    icon: Building2,
-  },
+  // {
+  //   title: "Live Monitoring",
+  //   href: "/monitoring",
+  //   icon: Map,
+  // },
+  // {
+  //   title: "Visit History",
+  //   href: "/visits",
+  //   icon: History,
+  // },
+  // {
+  //   title: "AMA",
+  //   href: "/amas",
+  //   icon: Trees,
+  // },
+  // {
+  //   title: "Estate",
+  //   href: "/estates",
+  //   icon: Building2,
+  // },
   {
     title: "Block",
     href: "/blocks",
     icon: Package,
   },
-  {
-    title: "Photos",
-    href: "/photos",
-    icon: ImageIcon,
-  },
-  {
-    title: "Reports",
-    href: "/reports",
-    icon: FileText,
-  },
-  {
-    title: "Analytics",
-    href: "/analytics",
-    icon: BarChart3,
-  },
+  // {
+  //   title: "Photos",
+  //   href: "/photos",
+  //   icon: ImageIcon,
+  // },
+  // {
+  //   title: "Reports",
+  //   href: "/reports",
+  //   icon: FileText,
+  // },
+  // {
+  //   title: "Analytics",
+  //   href: "/analytics",
+  //   icon: BarChart3,
+  // },
 ];
 
 export function Sidebar() {
@@ -209,37 +209,34 @@ function SidebarContent({
         </nav>
 
         <div className="p-4">
-          <div
-            className="
-              rounded-3xl
-              bg-gradient-to-br
-              from-blue-700
-              to-blue-600
-              p-5
-            "
-          >
-            <Headset size={24} className="text-white" />
+          <div className="rounded-3xl bg-gradient-to-br from-blue-700 to-blue-600 p-5">
+            <h3 className="mt-4 font-semibold text-white">Head Office</h3>
 
-            <h3 className="mt-4 font-semibold text-white">Need Help?</h3>
+            <div className="mt-4 space-y-3 text-xs leading-5 text-blue-100">
+              <div>
+                <p className="font-semibold text-white">
+                  PT PP London Sumatra Indonesia Tbk
+                </p>
 
-            <p className="mt-2 text-sm text-blue-100">
-              Contact administrator if you need assistance.
-            </p>
+                <p>Ariobimo Sentral, 12th Floor</p>
+                <p>Jl. HR. Rasuna Said Blok X-2 Kav.5</p>
+                <p>Jakarta 12950</p>
+              </div>
 
-            <button
-              className="
-                mt-4
-                w-full
-                rounded-2xl
-                bg-white
-                py-3
-                text-sm
-                font-semibold
-                text-blue-700
-              "
-            >
-              Contact Support
-            </button>
+              <div>
+                <p className="font-semibold text-white">Contact Information</p>
+
+                <p>
+                  <span className="font-medium text-white">Tel</span> : (+62 21)
+                  8065 7388
+                </p>
+
+                <p>
+                  <span className="font-medium text-white">Fax</span> : (+62 21)
+                  8065 7399
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

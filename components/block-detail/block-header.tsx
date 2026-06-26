@@ -15,8 +15,8 @@ import {
   Building2,
   Landmark,
   BadgeCheck,
+  ArrowRight,
 } from "lucide-react";
-
 interface Props {
   block: any;
 }
@@ -134,24 +134,36 @@ export function BlockHeader({ block }: Props) {
                 Edit
               </button>
 
-              <button
+              <Link
+                href={`/dashboard/visits/new?block=${block.id}`}
                 className="
-                  inline-flex
-                  items-center
-                  gap-2
-                  rounded-xl
-                  bg-green-600
-                  px-5
-                  py-3
-                  font-medium
-                  text-white
-                  transition
-                  hover:bg-green-700
-                "
+    group
+    inline-flex
+    items-center
+    gap-2
+    rounded-xl
+    bg-green-600
+    px-5
+    py-3
+    font-medium
+    text-white
+    shadow-sm
+    transition-all
+    duration-200
+    hover:bg-green-700
+    hover:shadow-lg
+    active:scale-[0.98]
+  "
               >
                 <ClipboardPlus size={18} />
-                New Visit
-              </button>
+
+                <span>Create Visit</span>
+
+                <ArrowRight
+                  size={16}
+                  className="transition-transform group-hover:translate-x-1"
+                />
+              </Link>
 
               <button
                 className="
