@@ -22,9 +22,15 @@ export interface Visit {
 
   inspector: string;
 
+  role?: string;
+
+  inspector_photo?: string;
+
   total_photos: number;
 
   total_findings: number;
 
   photos?: VisitPhoto[];
+
+  thumbnail?: string;
 }

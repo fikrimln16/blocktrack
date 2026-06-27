@@ -21,7 +21,10 @@ export async function getBlockVisits(blockId: number): Promise<Visit[]> {
         v.notes,
         v.status,
 
+        u.id AS user_id,
         u.name AS inspector,
+        u.role,
+        u.photo AS inspector_photo,
 
         COUNT(DISTINCT vp.id) AS total_photos,
 
@@ -46,7 +49,10 @@ export async function getBlockVisits(blockId: number): Promise<Visit[]> {
         v.weather,
         v.notes,
         v.status,
-        u.name
+        u.id,
+        u.name,
+        u.role,
+        u.photo
 
     ORDER BY
         v.visit_date DESC,
@@ -59,6 +65,15 @@ export async function getBlockVisits(blockId: number): Promise<Visit[]> {
 
   for (const visit of visits) {
     visit.photos = await getVisitPhotos(visit.id);
+
+    // Normalisasi path foto inspector
+    if (visit.inspector_photo) {
+      if (!visit.inspector_photo.startsWith("/")) {
+        visit.inspector_photo = `/uploads/photos/${visit.inspector_photo}`;
+      }
+    } else {
+      visit.inspector_photo = "/images/default-avatar.jpg";
+    }
   }
 
   return visits;

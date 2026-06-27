@@ -1,6 +1,7 @@
 "use client";
 
-import { ClipboardCheck, Camera, Clock3 } from "lucide-react";
+import Image from "next/image";
+import { ClipboardCheck, Camera, Clock3, Users } from "lucide-react";
 
 import { Visit } from "@/types/visit";
 
@@ -17,11 +18,17 @@ export function VisitHistory({ visits }: Props) {
     0,
   );
 
+  // Ambil inspector unik
+  const inspectors = visits.filter(
+    (visit, index, self) =>
+      self.findIndex((v) => v.inspector === visit.inspector) === index,
+  );
+
   return (
     <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
       {/* Header */}
       <div className="flex flex-col gap-5 border-b border-slate-200 bg-gradient-to-r from-blue-50 to-white px-6 py-6 lg:flex-row lg:items-center lg:justify-between">
-        <div>
+        <div className="space-y-4">
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-100">
               <ClipboardCheck size={22} className="text-blue-600" />
@@ -37,6 +44,33 @@ export function VisitHistory({ visits }: Props) {
               </p>
             </div>
           </div>
+
+          {/* Inspector Avatar */}
+          {inspectors.length > 0 && (
+            <div className="flex items-center gap-3">
+              <div className="flex -space-x-3">
+                {inspectors.slice(0, 5).map((visit) => (
+                  <Image
+                    key={visit.id}
+                    src={visit.inspector_photo ?? "/images/default-avatar.jpg"}
+                    alt={visit.inspector}
+                    width={36}
+                    height={36}
+                    className="rounded-full border-2 border-white object-cover shadow-sm"
+                  />
+                ))}
+              </div>
+
+              <div className="flex items-center gap-1 text-sm text-slate-500">
+                <Users size={15} />
+
+                <span>
+                  {inspectors.length} Inspector
+                  {inspectors.length > 1 ? "s" : ""}
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Summary */}

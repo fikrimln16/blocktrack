@@ -343,30 +343,88 @@ export async function getBlockById(id: number) {
   return row;
 }
 
-export async function getBlockVisits(blockId: number) {
-  const [rows] = await db.query(
+import { RowDataPacket } from "mysql2";
+
+import { Visit } from "@/types/visit";
+
+export async function getBlockVisits(blockId: number): Promise<Visit[]> {
+  const [rows] = await db.query<RowDataPacket[]>(
     `
     SELECT
       v.id,
+      v.visit_code,
       v.visit_date,
-      v.visit_type,
+      v.visit_time,
+      v.duration,
+      v.weather,
+      v.notes,
       v.status,
+
+      u.id AS user_id,
       u.name AS inspector,
-      COUNT(DISTINCT p.id) AS photos,
-      COUNT(DISTINCT f.id) AS findings
+      u.role,
+      u.photo AS inspector_photo,
+
+      COUNT(DISTINCT p.id) AS total_photos,
+      COUNT(DISTINCT f.id) AS total_findings,
+
+      (
+        SELECT vp.photo_url
+        FROM visit_photos vp
+        WHERE vp.visit_id = v.id
+        ORDER BY vp.id ASC
+        LIMIT 1
+      ) AS thumbnail
+
     FROM visits v
+
     LEFT JOIN users u
       ON u.id = v.user_id
+
     LEFT JOIN visit_photos p
       ON p.visit_id = v.id
+
     LEFT JOIN findings f
       ON f.visit_id = v.id
+
     WHERE v.block_id = ?
-    GROUP BY v.id
-    ORDER BY v.visit_date DESC
+
+    GROUP BY
+      v.id,
+      v.visit_code,
+      v.visit_date,
+      v.visit_time,
+      v.duration,
+      v.weather,
+      v.notes,
+      v.status,
+      u.id,
+      u.name,
+      u.role,
+      u.photo
+
+    ORDER BY
+      v.visit_date DESC,
+      v.visit_time DESC
     `,
     [blockId],
   );
 
-  return rows;
+  const visits = rows as Visit[];
+
+  return visits.map((visit) => ({
+    ...visit,
+
+    inspector_photo: visit.inspector_photo
+      ? visit.inspector_photo.startsWith("/uploads/")
+        ? visit.inspector_photo
+        : `/uploads/photos/${visit.inspector_photo}`
+      : "/images/default-avatar.jpg",
+
+    thumbnail: visit.thumbnail
+      ? visit.thumbnail.startsWith("/uploads/")
+        ? visit.thumbnail
+        : `/uploads/photos/${visit.thumbnail}`
+      : undefined,
+  }));
 }
