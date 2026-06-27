@@ -1,4 +1,5 @@
 export interface VisitFormValues {
+  user_id: number;
   visit_date: string;
   visit_time: string;
   weather: string;

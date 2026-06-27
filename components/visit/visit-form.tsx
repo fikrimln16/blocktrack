@@ -2,6 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { VisitHeader } from "./visit-header";
 import { VisitStepper } from "./visit-stepper";
@@ -12,16 +13,24 @@ import { VisitMap } from "./sections/visit-map";
 import { VisitPhotos } from "./sections/visit-photos";
 import { VisitNotes } from "./sections/visit-notes";
 import { VisitSummary } from "./sections/visit-summary";
+import { VisitInspector } from "./sections/visit-inspector";
 
 import { Block } from "@/types/block";
 import { VisitFormValues } from "@/types/visit-form";
+import { UserOption } from "@/types/user";
 
 interface Props {
   block: Block;
+  users: UserOption[];
 }
 
-export function VisitForm({ block }: Props) {
+export function VisitForm({ block, users }: Props) {
   const [saving, setSaving] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const router = useRouter();
+
   const {
     register,
     watch,
@@ -30,6 +39,7 @@ export function VisitForm({ block }: Props) {
     formState: { errors },
   } = useForm<VisitFormValues>({
     defaultValues: {
+      user_id: undefined,
       visit_date: new Date().toISOString().slice(0, 10),
       visit_time: new Date().toTimeString().slice(0, 5),
 
@@ -50,33 +60,48 @@ export function VisitForm({ block }: Props) {
     try {
       setSaving(true);
 
-      // Validasi sederhana
+      setErrorMessage("");
+      setSuccessMessage("");
+
+      // ==========================
+      // VALIDATION
+      // ==========================
+
+      if (!data.user_id) {
+        setErrorMessage("Please select an inspector.");
+        return;
+      }
+
       if (!data.latitude || !data.longitude) {
-        alert("Please capture GPS location.");
+        setErrorMessage("Please capture the GPS location.");
         return;
       }
 
       if (photos.length === 0) {
-        alert("Please upload at least one photo.");
+        setErrorMessage("Please upload at least one photo.");
         return;
       }
 
-      // Payload visit
+      // ==========================
+      // PAYLOAD
+      // ==========================
+
       const visitPayload = {
+        user_id: data.user_id,
         block_id: block.id,
+
         visit_date: data.visit_date,
         visit_time: data.visit_time,
+
         weather: data.weather,
         duration: data.duration,
+
         latitude: data.latitude,
         longitude: data.longitude,
         accuracy: data.accuracy,
+
         notes: data.notes,
       };
-
-      // ==========================
-      // FormData
-      // ==========================
 
       const formData = new FormData();
 
@@ -86,26 +111,6 @@ export function VisitForm({ block }: Props) {
         formData.append("photos", photo);
       });
 
-      // ==========================
-      // DEBUG
-      // ==========================
-
-      console.log("========== VISIT ==========");
-      console.log(visitPayload);
-
-      console.log("========== PHOTOS ==========");
-      console.log(photos);
-
-      console.log("========== FORMDATA ==========");
-
-      for (const [key, value] of formData.entries()) {
-        console.log(key, value);
-      }
-
-      // ==========================
-      // REQUEST
-      // ==========================
-
       const response = await fetch("/api/visits", {
         method: "POST",
         body: formData,
@@ -113,20 +118,27 @@ export function VisitForm({ block }: Props) {
 
       const result = await response.json();
 
-      console.log(result);
-
       if (!response.ok || !result.success) {
-        throw new Error(result.message || "Failed to save visit");
+        throw new Error(result.message ?? "Failed to save visit.");
       }
 
-      alert("Visit created successfully.");
+      setSuccessMessage("Visit created successfully.");
 
-      // nanti bisa diarahkan ke detail visit
+      console.log(result);
+
+      setTimeout(() => {
+        router.replace(`/blocks/${block.id}`);
+        router.refresh();
+      }, 1500);
+
+      // TODO
       // router.push(`/dashboard/visits/${result.visitId}`);
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
 
-      alert("Failed to save visit.");
+      setErrorMessage(
+        err instanceof Error ? err.message : "Failed to save visit.",
+      );
     } finally {
       setSaving(false);
     }
@@ -142,7 +154,19 @@ export function VisitForm({ block }: Props) {
         {/* LEFT */}
         <div className="xl:col-span-8">
           <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-            <VisitInformation register={register} errors={errors} />
+            <VisitInspector
+              users={users}
+              register={register}
+              watch={watch}
+              setValue={setValue}
+              errors={errors}
+            />
+
+            <VisitInformation
+              register={register}
+              errors={errors}
+              users={users}
+            />
 
             <VisitLocation watch={watch} setValue={setValue} errors={errors} />
 
@@ -164,6 +188,18 @@ export function VisitForm({ block }: Props) {
           <VisitSummary values={watch()} photos={photos} />
         </div>
       </div>
+
+      {errorMessage && (
+        <div className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4">
+          <p className="text-sm font-medium text-red-600">{errorMessage}</p>
+        </div>
+      )}
+
+      {successMessage && (
+        <div className="rounded-2xl border border-green-200 bg-green-50 px-5 py-4">
+          <p className="text-sm font-medium text-green-700">{successMessage}</p>
+        </div>
+      )}
 
       {/* Footer */}
       <div className="flex justify-end gap-4 border-t border-slate-200 pt-8">
@@ -194,11 +230,18 @@ export function VisitForm({ block }: Props) {
             text-white
             transition
             hover:bg-blue-700
-            disabled:cursor-not-allowed
-            disabled:opacity-50
-         "
+            disabled:pointer-events-none
+            disabled:opacity-60
+          "
         >
-          {saving ? "Saving..." : "Save Visit"}
+          {saving ? (
+            <div className="flex items-center gap-2">
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              Saving Visit...
+            </div>
+          ) : (
+            "Save Visit"
+          )}
         </button>
       </div>
     </form>

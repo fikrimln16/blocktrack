@@ -1,6 +1,7 @@
 import { PoolConnection, ResultSetHeader } from "mysql2/promise";
 
 interface CreateVisitPayload {
+  user_id: number;
   block_id: number;
   visit_date: string;
   visit_time: string;
@@ -14,35 +15,39 @@ interface CreateVisitPayload {
 
 export async function createVisit(
   connection: PoolConnection,
-  data: CreateVisitPayload,
-): Promise<number> {
-  const [result] = await connection.execute<ResultSetHeader>(
+  visit: CreateVisitPayload,
+) {
+  const [result]: any = await connection.query(
     `
-      INSERT INTO visits
-      (
-        block_id,
-        visit_date,
-        visit_time,
-        weather,
-        duration,
-        latitude,
-        longitude,
-        accuracy,
-        notes
-      )
-      VALUES
-      (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO visits
+    (
+      user_id,
+      block_id,
+      visit_date,
+      visit_time,
+      weather,
+      duration,
+      latitude,
+      longitude,
+      accuracy,
+      notes
+    )
+    VALUES
+    (
+      ?,?,?,?,?,?,?,?,?,?
+    )
     `,
     [
-      data.block_id,
-      data.visit_date,
-      data.visit_time,
-      data.weather,
-      data.duration,
-      data.latitude,
-      data.longitude,
-      data.accuracy ?? null,
-      data.notes,
+      visit.user_id,
+      visit.block_id,
+      visit.visit_date,
+      visit.visit_time,
+      visit.weather,
+      visit.duration,
+      visit.latitude,
+      visit.longitude,
+      visit.accuracy,
+      visit.notes,
     ],
   );
 

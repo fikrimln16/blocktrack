@@ -2,11 +2,18 @@
 
 import { CalendarDays, Clock3, CloudSun, TimerReset } from "lucide-react";
 import { VisitFormValues } from "@/types/visit-form";
-import { FieldErrors } from "react-hook-form";
+import {
+  UseFormRegister,
+  FieldErrors,
+  UseFormWatch,
+  UseFormSetValue,
+} from "react-hook-form";
+import { UserOption } from "@/types/user";
 
 interface Props {
-  register: any;
+  register: UseFormRegister<VisitFormValues>;
   errors: FieldErrors<VisitFormValues>;
+  users: UserOption[];
 }
 
 const weatherOptions = [
@@ -34,9 +41,9 @@ const weatherOptions = [
 
 const durationOptions = [15, 30, 45, 60, 90, 120];
 
-export function VisitInformation({ register, errors }: Props) {
+export function VisitInformation({ register, errors, users }: Props) {
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 mt-6">
       <div>
         <h2 className="text-xl font-semibold text-slate-900">
           Visit Information

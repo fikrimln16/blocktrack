@@ -1,8 +1,12 @@
 import { RowDataPacket } from "mysql2";
+import fs from "fs/promises";
+import path from "path";
 
 import db from "@/lib/db";
 
 import { Visit } from "@/types/visit";
+
+import { createVisit, createVisitPhoto } from "@/repositories/visit.repository";
 
 export async function getBlockVisits(blockId: number): Promise<Visit[]> {
   const [rows] = await db.query<RowDataPacket[]>(
@@ -60,37 +64,54 @@ export async function getBlockVisits(blockId: number): Promise<Visit[]> {
   return visits;
 }
 
-import { createVisit, createVisitPhoto } from "@/repositories/visit.repository";
-
 interface VisitPayload {
+  user_id: number;
+
   block_id: number;
+
   visit_date: string;
   visit_time: string;
+
   weather: string;
   duration: number;
+
   latitude: number;
   longitude: number;
   accuracy?: number;
+
   notes: string;
 }
 
-export async function saveVisit(visit: VisitPayload, photos: string[]) {
+export async function saveVisit(visit: VisitPayload, photos: File[]) {
   const connection = await db.getConnection();
 
   try {
     await connection.beginTransaction();
 
-    // =============================
-    // Create Visit
-    // =============================
+    console.log("===== SAVE VISIT =====");
+    console.log(visit);
 
     const visitId = await createVisit(connection, visit);
 
-    // =============================
-    // Save Photos
-    // =============================
+    const uploadDir = path.join(process.cwd(), "public", "uploads", "photos");
 
-    for (const photoUrl of photos) {
+    await fs.mkdir(uploadDir, {
+      recursive: true,
+    });
+
+    for (const photo of photos) {
+      const bytes = await photo.arrayBuffer();
+
+      const buffer = Buffer.from(bytes);
+
+      const fileName = `${Date.now()}-${photo.name.replace(/\s+/g, "-")}`;
+
+      const filePath = path.join(uploadDir, fileName);
+
+      await fs.writeFile(filePath, buffer);
+
+      const photoUrl = `/uploads/photos/${fileName}`;
+
       await createVisitPhoto(connection, visitId, photoUrl);
     }
 
@@ -99,16 +120,10 @@ export async function saveVisit(visit: VisitPayload, photos: string[]) {
     return visitId;
   } catch (error) {
     await connection.rollback();
-
     throw error;
   } finally {
     connection.release();
   }
-}
-
-export interface VisitPhoto {
-  id: number;
-  photo_url: string;
 }
 
 export interface VisitPhoto extends RowDataPacket {
@@ -119,13 +134,13 @@ export interface VisitPhoto extends RowDataPacket {
 export async function getVisitPhotos(visitId: number): Promise<VisitPhoto[]> {
   const [rows] = await db.query<RowDataPacket[]>(
     `
-      SELECT
-        id,
-        photo_url
-      FROM visit_photos
-      WHERE visit_id = ?
-      ORDER BY id ASC
-      LIMIT 4
+    SELECT
+      id,
+      photo_url
+    FROM visit_photos
+    WHERE visit_id = ?
+    ORDER BY id ASC
+    LIMIT 4
     `,
     [visitId],
   );
