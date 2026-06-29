@@ -1,39 +1,32 @@
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 
-import { StatsCards } from "@/components/dashboard/stats-card";
-import { MonitoringMap } from "@/components/dashboard/monitoring-map";
-import { RecentVisits } from "@/components/dashboard/recent-visits";
-import { VisitTable } from "@/components/dashboard/visit-table";
-import { SummaryChart } from "@/components/dashboard/summary-charts";
+import { DashboardSummary } from "@/components/dashboard/summary/dashboard-summary";
+import { DashboardStatistics } from "@/components/dashboard/statistics/dashboard-statistic";
+import { TopVisitors } from "@/components/dashboard/top-visitors/top-visitors";
+import { RecentActivityFeed } from "@/components/dashboard/recent-activity/recent-activity";
 
-export default function DashboardPage() {
+import { getDashboardSummary } from "@/services/dashboard.service";
+import { getDashboardStatistics } from "@/services/dashboard.service";
+import { getTopVisitors } from "@/services/dashboard.service";
+import { getRecentActivities } from "@/services/dashboard.service";
+
+export default async function DashboardPage() {
+  const summary = await getDashboardSummary();
+  const statistics = await getDashboardStatistics();
+  const topVisitors = await getTopVisitors();
+  const recentActivities = await getRecentActivities();
+
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        <StatsCards />
+      <div className="space-y-8">
+        <DashboardSummary summary={summary} />
 
-        {/* MAP + ACTIVITY */}
-
-        <div className="grid gap-6 2xl:grid-cols-12">
-          <div className="2xl:col-span-8">
-            <MonitoringMap />
+        <div className="grid gap-6 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            <RecentActivityFeed activities={recentActivities} />
           </div>
 
-          <div className="2xl:col-span-4">
-            <RecentVisits />
-          </div>
-        </div>
-
-        {/* TABLE + SUMMARY */}
-
-        <div className="grid gap-6 2xl:grid-cols-12">
-          <div className="2xl:col-span-8">
-            <VisitTable />
-          </div>
-
-          <div className="2xl:col-span-4">
-            <SummaryChart />
-          </div>
+          <TopVisitors visitors={topVisitors} />
         </div>
       </div>
     </DashboardLayout>
