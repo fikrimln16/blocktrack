@@ -23,7 +23,7 @@ interface Props {
 export function VisitHistoryItem({ visit }: Props) {
   return (
     <Link
-      href={`/dashboard/visits/${visit.id}`}
+      href={`/visits/${visit.id}`}
       className="
     group
     flex

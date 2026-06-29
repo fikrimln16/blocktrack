@@ -1,160 +1,157 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import { MapPinned, Map, Navigation } from "lucide-react";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 
-const VisitLeafletMap = dynamic(
-  () => import("./visit-map-leaflet").then((mod) => mod.VisitLeafletMap),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="flex h-full items-center justify-center">
-        <p className="text-sm text-slate-500">Loading map...</p>
-      </div>
-    ),
-  },
-);
+import {
+  GeoJSON,
+  LayersControl,
+  MapContainer,
+  Marker,
+  Popup,
+  TileLayer,
+} from "react-leaflet";
 
-interface VisitMapProps {
-  visit: any;
-  block: any;
+import buffer from "@turf/buffer";
+
+import { CircleCheckBig, CircleX, TriangleAlert } from "lucide-react";
+
+import booleanPointInPolygon from "@turf/boolean-point-in-polygon";
+import { point } from "@turf/helpers";
+
+import { FitPolygon } from "./fit-polygon";
+
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl:
+    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+});
+
+interface GeoJsonGeometry {
+  type: "Polygon" | "MultiPolygon";
+  coordinates: any;
 }
 
-export function VisitMap({ visit, block }: VisitMapProps) {
+interface Props {
+  latitude: number;
+  longitude: number;
+  polygon: GeoJsonGeometry | null;
+}
+
+export function VisitMap({ latitude, longitude, polygon }: Props) {
+  const visitPoint = point([longitude, latitude]);
+
+  const inside =
+    polygon != null ? booleanPointInPolygon(visitPoint, polygon as any) : false;
+
+  // Buffer 20 meter di sekitar polygon
+  const bufferedPolygon =
+    polygon != null
+      ? buffer(polygon as any, 20, {
+          units: "meters",
+        })
+      : null;
+
+  const near =
+    !inside && bufferedPolygon
+      ? booleanPointInPolygon(visitPoint, bufferedPolygon as any)
+      : false;
+
+  const status = inside
+    ? {
+        label: "Inside Block",
+        className: "bg-emerald-100 text-emerald-700",
+        Icon: CircleCheckBig,
+      }
+    : near
+      ? {
+          label: "Near Block",
+          className: "bg-amber-100 text-amber-700",
+          Icon: TriangleAlert,
+        }
+      : {
+          label: "Outside Block",
+          className: "bg-red-100 text-red-700",
+          Icon: CircleX,
+        };
+
+  const StatusIcon = status.Icon;
+
   return (
-    <div
-      className="
-        overflow-hidden
-        rounded-[28px]
-        border border-slate-200
-        bg-white
-        shadow-sm
-      "
-    >
+    <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
       {/* Header */}
+      <div className="flex items-center justify-between border-b border-slate-200 p-6">
+        <div>
+          <h2 className="text-xl font-semibold">Block Location</h2>
 
-      <div className="border-b border-slate-200 p-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <div className="flex items-center gap-2">
-              <MapPinned size={20} className="text-blue-600" />
-
-              <h3 className="text-lg font-semibold text-slate-900">
-                Visit Location
-              </h3>
-            </div>
-
-            <p className="mt-1 text-sm text-slate-500">
-              Current visit location inside plantation block
-            </p>
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            <span
-              className="
-                inline-flex
-                items-center
-                gap-2
-                rounded-xl
-                bg-blue-50
-                px-3
-                py-2
-                text-sm
-                font-medium
-                text-blue-700
-              "
-            >
-              <Map size={16} />
-              {block.blockCode}
-            </span>
-
-            <span
-              className="
-                inline-flex
-                items-center
-                gap-2
-                rounded-xl
-                bg-green-50
-                px-3
-                py-2
-                text-sm
-                font-medium
-                text-green-700
-              "
-            >
-              <Navigation size={16} />
-              GPS Active
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Map */}
-
-      <div className="relative">
-        <div className="h-[380px] md:h-[520px]">
-          <VisitLeafletMap visit={visit} block={block} />
+          <p className="mt-1 text-sm text-slate-500">
+            Visit position compared with block boundary.
+          </p>
         </div>
 
-        {/* Floating Info */}
-
-        <div
-          className="
-            absolute
-            bottom-4
-            left-4
-            z-[500]
-            rounded-2xl
-            bg-white/95
-            p-4
-            shadow-lg
-            backdrop-blur
-          "
+        <span
+          className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium ${status.className}`}
         >
-          <div className="space-y-2 text-sm">
-            <div className="flex items-center gap-2">
-              <span className="h-3 w-3 rounded-full bg-blue-600"></span>
-              <span className="text-slate-600">Current Visit</span>
-            </div>
+          <StatusIcon size={16} />
 
-            <div className="flex items-center gap-2">
-              <span className="h-3 w-3 rounded-full bg-green-500"></span>
-              <span className="text-slate-600">Block Polygon</span>
-            </div>
-          </div>
-        </div>
+          {status.label}
+        </span>
       </div>
 
-      {/* Footer */}
+      <div className="h-[600px]">
+        <MapContainer
+          center={[latitude, longitude]}
+          zoom={18}
+          className="h-full w-full"
+        >
+          <FitPolygon polygon={polygon} />
 
-      <div className="grid grid-cols-1 gap-4 border-t border-slate-200 p-6 md:grid-cols-3">
-        <InfoCard title="Latitude" value={visit.location.latitude.toFixed(6)} />
+          <LayersControl position="topright">
+            <LayersControl.BaseLayer checked name="Satellite">
+              <TileLayer
+                attribution="Esri"
+                url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+              />
+            </LayersControl.BaseLayer>
 
-        <InfoCard
-          title="Longitude"
-          value={visit.location.longitude.toFixed(6)}
-        />
+            <LayersControl.BaseLayer name="Street">
+              <TileLayer
+                attribution="OpenStreetMap"
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+            </LayersControl.BaseLayer>
+          </LayersControl>
 
-        <InfoCard title="Block" value={block.blockCode} />
+          {/* Polygon Block */}
+          {polygon && (
+            <GeoJSON
+              data={polygon as any}
+              style={{
+                color: "#16a34a",
+                weight: 3,
+                fillColor: "#22c55e",
+                fillOpacity: 0.25,
+              }}
+            />
+          )}
+
+          {/* Visit Marker */}
+          <Marker position={[latitude, longitude]}>
+            <Popup>
+              <div className="space-y-1">
+                <p className="font-semibold">Visit Location</p>
+
+                <p className="text-xs">Lat: {latitude}</p>
+
+                <p className="text-xs">Lng: {longitude}</p>
+              </div>
+            </Popup>
+          </Marker>
+        </MapContainer>
       </div>
-    </div>
-  );
-}
-
-function InfoCard({ title, value }: { title: string; value: string }) {
-  return (
-    <div
-      className="
-        rounded-2xl
-        bg-slate-50
-        p-4
-      "
-    >
-      <p className="text-xs uppercase tracking-wide text-slate-500">{title}</p>
-
-      <p className="mt-1 font-mono text-sm font-semibold text-slate-900">
-        {value}
-      </p>
     </div>
   );
 }
