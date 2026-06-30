@@ -7,6 +7,7 @@ import { VisitOverview } from "@/components/visit-detail/visit-overview";
 import { VisitLocation } from "@/components/visit-detail/visit-location";
 import { VisitMap } from "@/components/visit-detail/visit-map";
 import { VisitDocumentation } from "@/components/visit-detail/documentation/visit-documentation";
+import { VisitAttachments } from "@/components/visit-detail/attachments/visit-attachments";
 
 import { findVisitDetail } from "@/services/visit-detail.service";
 import { VisitMapWrapper } from "@/components/visit-detail/visit-map-wrapper";
@@ -52,7 +53,11 @@ export default async function VisitDetailPage({ params }: Props) {
           </div>
         </div>
 
-        <VisitDocumentation visit={visit} />
+        <div className="space-y-8">
+          <VisitDocumentation visit={visit} />
+
+          <VisitAttachments visit={visit} />
+        </div>
       </div>
     </DashboardLayout>
   );

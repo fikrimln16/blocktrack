@@ -12,51 +12,42 @@ export async function getBlockVisits(blockId: number): Promise<Visit[]> {
   const [rows] = await db.query<RowDataPacket[]>(
     `
     SELECT
-        v.id,
-        v.visit_code,
-        v.visit_date,
-        v.visit_time,
-        v.duration,
-        v.weather,
-        v.notes,
-        v.status,
+      v.id,
+      v.visit_code,
+      v.visit_date,
+      v.visit_time,
+      v.duration,
+      v.weather,
+      v.notes,
+      v.status,
 
-        u.id AS user_id,
-        u.name AS inspector,
-        u.role,
-        u.photo AS inspector_photo,
+      u.id AS user_id,
+      u.name AS inspector,
+      u.role,
+      u.photo AS inspector_photo,
 
-        COUNT(DISTINCT vp.id) AS total_photos,
+      (
+        SELECT COUNT(*)
+        FROM visit_photos vp
+        WHERE vp.visit_id = v.id
+      ) AS total_photos,
 
-        0 AS total_findings
+      (
+        SELECT COUNT(*)
+        FROM visit_attachments va
+        WHERE va.visit_id = v.id
+      ) AS total_attachments
 
     FROM visits v
 
     LEFT JOIN users u
       ON u.id = v.user_id
 
-    LEFT JOIN visit_photos vp
-      ON vp.visit_id = v.id
-
     WHERE v.block_id = ?
 
-    GROUP BY
-        v.id,
-        v.visit_code,
-        v.visit_date,
-        v.visit_time,
-        v.duration,
-        v.weather,
-        v.notes,
-        v.status,
-        u.id,
-        u.name,
-        u.role,
-        u.photo
-
     ORDER BY
-        v.visit_date DESC,
-        v.visit_time DESC
+      v.visit_date DESC,
+      v.visit_time DESC
     `,
     [blockId],
   );
@@ -66,7 +57,6 @@ export async function getBlockVisits(blockId: number): Promise<Visit[]> {
   for (const visit of visits) {
     visit.photos = await getVisitPhotos(visit.id);
 
-    // Normalisasi path foto inspector
     if (visit.inspector_photo) {
       if (!visit.inspector_photo.startsWith("/")) {
         visit.inspector_photo = `/uploads/photos/${visit.inspector_photo}`;

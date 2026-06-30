@@ -10,6 +10,8 @@ import {
   UserRound,
   ChevronRight,
   CloudSun,
+  Paperclip,
+  Timer,
 } from "lucide-react";
 
 import { Visit } from "@/types/visit";
@@ -86,23 +88,26 @@ export function VisitHistoryItem({ visit }: Props) {
           </div>
 
           {/* Information */}
-          <div className="mt-4 flex flex-wrap gap-5 text-sm text-slate-500">
-            <span className="flex items-center gap-2">
-              <Camera size={16} />
-              {visit.total_photos} Photos
-            </span>
+          <div className="mt-4 flex flex-wrap items-center gap-5 text-sm text-slate-500">
+            <div className="flex items-center gap-2">
+              <Camera size={16} className="text-blue-500" />
+              <span>{visit.total_photos ?? 0} Photos</span>
+            </div>
 
-            <span className="flex items-center gap-2">
-              <TriangleAlert size={16} />
-              {visit.total_findings} Findings
-            </span>
+            <div className="flex items-center gap-2">
+              <Paperclip size={16} className="text-orange-500" />
+              <span>{visit.total_attachments ?? 0} Attachments</span>
+            </div>
 
-            <span className="flex items-center gap-2">
-              <CloudSun size={16} />
-              {visit.weather}
-            </span>
+            <div className="flex items-center gap-2">
+              <CloudSun size={16} className="text-sky-500" />
+              <span>{visit.weather || "-"}</span>
+            </div>
 
-            <span>{visit.duration} menit</span>
+            <div className="flex items-center gap-2">
+              <Timer size={16} className="text-violet-500" />
+              <span>{visit.duration ?? 0} menit</span>
+            </div>
           </div>
 
           {/* Photo Gallery */}

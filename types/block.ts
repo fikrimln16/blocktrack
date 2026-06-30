@@ -33,4 +33,7 @@ export interface Block extends RowDataPacket {
   ama: string;
 
   total_visit: number;
+
+  total_photos: number;
+  total_attachments: number;
 }

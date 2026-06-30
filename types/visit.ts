@@ -27,7 +27,7 @@ export interface Visit {
   inspector_photo?: string;
 
   total_photos: number;
-
+  total_attachments: number;
   total_findings: number;
 
   photos?: VisitPhoto[];

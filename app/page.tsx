@@ -1,131 +1,147 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { ChevronLeft, Download } from "lucide-react";
+import {
+  ArrowRight,
+  BarChart3,
+  FileText,
+  MapPinned,
+  ShieldCheck,
+} from "lucide-react";
 
-import { DashboardLayout } from "@/components/layout/dashboard-layout";
-
-import { VisitHeader } from "@/components/visit-detail/visit-header";
-import { VisitInfo } from "@/components/visit-detail/visit-info";
-import { VisitMap } from "@/components/visit-detail/visit-map";
-import { VisitGallery } from "@/components/visit-detail/visit-gallery";
-import { VisitAttachments } from "@/components/visit-detail/visit-attachments";
-
-import { visits } from "@/data/visits";
-import { blocks } from "@/data/blocks";
-import { estates } from "@/data/estates";
-import { amas } from "@/data/amas";
-
-interface PageProps {
-  params: Promise<{
-    id: string;
-  }>;
-}
-
-export default async function VisitDetailPage({ params }: PageProps) {
-  const { id } = await params;
-
-  const visit = visits.find((item) => item.id === Number(id));
-
-  if (!visit) {
-    notFound();
-  }
-
-  const block = blocks.find((item) => item.id === visit.blockId);
-
-  const estate = estates.find((item) => item.id === block?.estateId);
-
-  const ama = amas.find((item) => item.id === estate?.amaId);
-
+export default function LandingPage() {
   return (
-    <DashboardLayout>
-      <div className="space-y-6">
-        {/* Breadcrumb */}
-
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+      {/* Navbar */}
+      <header className="border-b border-slate-200 bg-white/80 backdrop-blur">
+        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
           <div>
-            <div className="flex items-center gap-2 text-sm text-slate-500">
-              <Link href="/dashboard" className="hover:text-blue-600">
-                Dashboard
-              </Link>
-
-              <span>/</span>
-
-              <Link href="/visits" className="hover:text-blue-600">
-                Visit History
-              </Link>
-
-              <span>/</span>
-
-              <span className="text-slate-900">{visit.visitCode}</span>
-            </div>
-
-            <h1 className="mt-2 text-3xl font-bold text-slate-900">
-              Visit Detail
+            <h1 className="text-2xl font-bold text-blue-700">
+              Visit Management
             </h1>
 
-            <p className="mt-1 text-slate-500">
-              Detail visit, location, gallery, and attachments.
+            <p className="text-sm text-slate-500">
+              Plantation Inspection System
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="flex items-center gap-3">
             <Link
-              href="/visits"
-              className="
-                flex items-center gap-2
-                rounded-2xl
-                border border-slate-200
-                bg-white
-                px-4 py-3
-                text-sm
-                font-medium
-                hover:bg-slate-50
-              "
+              href="/login"
+              className="rounded-xl border border-slate-200 px-5 py-2.5 font-medium transition hover:bg-slate-100"
             >
-              <ChevronLeft size={18} />
-              Back
+              Login
             </Link>
 
-            <button
-              className="
-                flex items-center gap-2
-                rounded-2xl
-                bg-blue-600
-                px-4 py-3
-                text-sm
-                font-medium
-                text-white
-                hover:bg-blue-700
-              "
+            <Link
+              href="/dashboard"
+              className="rounded-xl bg-blue-600 px-5 py-2.5 font-medium text-white transition hover:bg-blue-700"
             >
-              <Download size={18} />
-              Download Report
-            </button>
+              Dashboard
+            </Link>
           </div>
         </div>
+      </header>
 
-        <VisitHeader visit={visit} ama={ama} estate={estate} block={block} />
+      {/* Hero */}
+      <section className="mx-auto max-w-7xl px-6 py-24">
+        <div className="grid items-center gap-16 lg:grid-cols-2">
+          <div>
+            <span className="rounded-full bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700">
+              Plantation Monitoring Platform
+            </span>
 
-        <div className="grid gap-6 xl:grid-cols-12">
-          <div className="xl:col-span-4">
-            <VisitInfo visit={visit} ama={ama} estate={estate} block={block} />
+            <h1 className="mt-8 text-5xl font-bold leading-tight text-slate-900">
+              Digital Inspection &
+              <br />
+              Visit Management
+            </h1>
+
+            <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600">
+              Kelola seluruh aktivitas kunjungan lapangan, dokumentasi, GPS
+              tracking, attachment, dan laporan inspeksi dalam satu sistem yang
+              modern.
+            </p>
+
+            <div className="mt-10 flex flex-wrap gap-4">
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-2 rounded-2xl bg-blue-600 px-6 py-4 font-semibold text-white transition hover:bg-blue-700"
+              >
+                Open Dashboard
+                <ArrowRight size={18} />
+              </Link>
+
+              <Link
+                href="/login"
+                className="rounded-2xl border border-slate-300 bg-white px-6 py-4 font-semibold text-slate-700 transition hover:bg-slate-100"
+              >
+                Sign In
+              </Link>
+            </div>
           </div>
 
-          <div className="xl:col-span-8">
-            <VisitMap visit={visit} block={block} />
+          {/* Illustration */}
+          <div className="rounded-[32px] border border-slate-200 bg-white p-10 shadow-xl">
+            <div className="grid gap-6 sm:grid-cols-2">
+              <FeatureCard
+                icon={<MapPinned className="text-blue-600" size={28} />}
+                title="GPS Validation"
+                description="Validasi lokasi kunjungan dengan area blok."
+              />
+
+              <FeatureCard
+                icon={<FileText className="text-green-600" size={28} />}
+                title="Documentation"
+                description="Kelola foto dan attachment setiap visit."
+              />
+
+              <FeatureCard
+                icon={<BarChart3 className="text-orange-500" size={28} />}
+                title="Analytics"
+                description="Laporan inspeksi secara realtime."
+              />
+
+              <FeatureCard
+                icon={<ShieldCheck className="text-purple-600" size={28} />}
+                title="Secure Data"
+                description="Semua data tersimpan secara aman."
+              />
+            </div>
           </div>
         </div>
+      </section>
 
-        <div className="grid gap-6 xl:grid-cols-12">
-          <div className="xl:col-span-8">
-            {/* <VisitGallery photos={visit.photos} /> */}
-          </div>
+      {/* Footer */}
+      <footer className="border-t border-slate-200 bg-white">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-8">
+          <p className="text-sm text-slate-500">
+            © {new Date().getFullYear()} Visit Management System
+          </p>
 
-          <div className="xl:col-span-4">
-            {/* <VisitAttachments attachments={visit.attachments} /> */}
-          </div>
+          <p className="text-sm text-slate-400">
+            Built with Next.js & Tailwind CSS
+          </p>
         </div>
+      </footer>
+    </main>
+  );
+}
+
+interface FeatureCardProps {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}
+
+function FeatureCard({ icon, title, description }: FeatureCardProps) {
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 transition hover:-translate-y-1 hover:shadow-md">
+      <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-white shadow-sm">
+        {icon}
       </div>
-    </DashboardLayout>
+
+      <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
+
+      <p className="mt-2 text-sm leading-6 text-slate-500">{description}</p>
+    </div>
   );
 }

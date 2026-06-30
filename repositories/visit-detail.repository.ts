@@ -1,6 +1,8 @@
 import db from "@/lib/db";
 
 import {
+  VisitAttachment,
+  VisitAttachmentRow,
   VisitDetail,
   VisitPhoto,
   VisitPhotoRow,
@@ -77,12 +79,54 @@ export async function getVisitDetail(id: number): Promise<VisitDetail> {
     [id],
   );
 
+  const [attachmentRows] = await db.query<VisitAttachmentRow[]>(
+    `
+    SELECT
+      id,
+      visit_id,
+      original_name,
+      file_name,
+      file_url,
+      file_type,
+      file_extension,
+      file_size,
+      category,
+      uploaded_by,
+      created_at
+    FROM visit_attachments
+    WHERE visit_id = ?
+    ORDER BY created_at DESC
+    `,
+    [id],
+  );
+
   const photos: VisitPhoto[] = photoRows.map((photo) => ({
     id: photo.id,
     visit_id: photo.visit_id,
     photo_url: photo.photo_url,
     category: photo.category,
     created_at: photo.created_at,
+  }));
+
+  const attachments: VisitAttachment[] = attachmentRows.map((attachment) => ({
+    id: attachment.id,
+    visit_id: attachment.visit_id,
+
+    original_name: attachment.original_name,
+    file_name: attachment.file_name,
+
+    file_url: attachment.file_url,
+
+    file_type: attachment.file_type,
+    file_extension: attachment.file_extension,
+
+    file_size: attachment.file_size,
+
+    category: attachment.category,
+
+    uploaded_by: attachment.uploaded_by,
+
+    created_at: attachment.created_at,
   }));
 
   return {
@@ -98,5 +142,7 @@ export async function getVisitDetail(id: number): Promise<VisitDetail> {
         : visit.polygon,
 
     photos,
+
+    attachments,
   };
 }

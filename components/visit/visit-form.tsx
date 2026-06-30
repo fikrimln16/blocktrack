@@ -168,7 +168,12 @@ export function VisitForm({ block, users }: Props) {
               users={users}
             />
 
-            <VisitLocation watch={watch} setValue={setValue} errors={errors} />
+            <VisitLocation
+              watch={watch}
+              setValue={setValue}
+              errors={errors}
+              blockGeometry={block.geometry}
+            />
 
             <VisitMap
               block={block}

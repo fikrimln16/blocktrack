@@ -51,6 +51,8 @@ export interface VisitDetail {
   polygon: GeoJsonPolygon | null;
 
   photos: VisitPhoto[];
+
+  attachments: VisitAttachment[];
 }
 
 /**
@@ -102,5 +104,53 @@ export interface VisitPhotoRow extends RowDataPacket {
   visit_id: number;
   photo_url: string;
   category: string | null;
+  created_at: string;
+}
+
+export interface VisitAttachment {
+  id: number;
+
+  visit_id: number;
+
+  original_name: string;
+
+  file_name: string;
+
+  file_url: string;
+
+  file_type: string;
+
+  file_extension: string;
+
+  file_size: number;
+
+  category: string | null;
+
+  uploaded_by: number | null;
+
+  created_at: string;
+}
+
+export interface VisitAttachmentRow extends RowDataPacket {
+  id: number;
+
+  visit_id: number;
+
+  original_name: string;
+
+  file_name: string;
+
+  file_url: string;
+
+  file_type: string;
+
+  file_extension: string;
+
+  file_size: number;
+
+  category: string | null;
+
+  uploaded_by: number | null;
+
   created_at: string;
 }

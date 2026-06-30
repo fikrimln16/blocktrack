@@ -318,7 +318,23 @@ export async function getBlockById(id: number) {
         SELECT COUNT(*)
         FROM visits v
         WHERE v.block_id = b.id
-      ) AS total_visit
+      ) AS total_visit,
+
+      (
+        SELECT COUNT(*)
+        FROM visit_attachments va
+        INNER JOIN visits v
+          ON v.id = va.visit_id
+        WHERE v.block_id = b.id
+      ) AS total_attachments,
+
+      (
+        SELECT COUNT(*)
+        FROM visit_photos vp
+        INNER JOIN visits v
+          ON v.id = vp.visit_id
+        WHERE v.block_id = b.id
+      ) AS total_photos
 
     FROM blocks b
 

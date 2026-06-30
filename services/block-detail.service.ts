@@ -27,7 +27,23 @@ export async function getBlockDetail(id: number) {
         SELECT COUNT(*)
         FROM visits v
         WHERE v.block_id = b.id
-      ) AS total_visit
+      ) AS total_visit,
+
+      (
+        SELECT COUNT(*)
+        FROM visit_attachments va
+        INNER JOIN visits v
+          ON v.id = va.visit_id
+        WHERE v.block_id = b.id
+      ) AS total_attachments,
+
+      (
+        SELECT COUNT(*)
+        FROM visit_photos vp
+        INNER JOIN visits v
+          ON v.id = vp.visit_id
+        WHERE v.block_id = b.id
+      ) AS total_photos
 
     FROM blocks b
 
@@ -38,6 +54,7 @@ export async function getBlockDetail(id: number) {
       ON a.id = e.ama_id
 
     WHERE b.id = ?
+
     LIMIT 1
     `,
     [id],
@@ -45,7 +62,9 @@ export async function getBlockDetail(id: number) {
 
   const block = (rows as any[])[0];
 
-  if (!block) return null;
+  if (!block) {
+    return null;
+  }
 
   block.geometry =
     typeof block.geometry === "string"
