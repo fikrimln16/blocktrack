@@ -19,9 +19,7 @@ export function RecentActivityFeed({ activities }: Props) {
         <div>
           <h2 className="text-lg font-semibold">Recent Activity</h2>
 
-          <p className="text-sm text-slate-500">
-            Latest inspection activities.
-          </p>
+          <p className="text-sm text-slate-500">Latest visitors activities.</p>
         </div>
       </div>
 

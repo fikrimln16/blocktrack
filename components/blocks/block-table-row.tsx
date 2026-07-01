@@ -3,6 +3,7 @@
 import { Block } from "@/types/block";
 import { BlockStatusBadge } from "./block-status-badge";
 import Link from "next/link";
+import { Eye } from "lucide-react";
 
 interface Props {
   index: number;
@@ -98,15 +99,30 @@ export function BlockTableRow({ index, block, active, onClick }: Props) {
       </td>
 
       {/* Detail */}
-      <td className="px-4 py-4">
-        <Link href={`/blocks/${block.id}`} className="block">
-          <div className="space-y-1">
-            <p className="font-semibold text-slate-900 hover:text-blue-600">
-              {block.block_code}
-            </p>
-
-            <p className="text-xs text-slate-500">{block.block_name || "-"}</p>
-          </div>
+      {/* Detail */}
+      <td className="px-4 py-4 text-center">
+        <Link
+          href={`/blocks/${block.id}`}
+          className="
+            inline-flex
+            h-10
+            w-10
+            items-center
+            justify-center
+            rounded-xl
+            border
+            border-slate-200
+            bg-white
+            text-slate-600
+            transition-all
+            duration-200
+            hover:border-blue-500
+            hover:bg-blue-50
+            hover:text-blue-600
+          "
+          title="View Detail"
+        >
+          <Eye size={18} />
         </Link>
       </td>
     </>

@@ -148,9 +148,9 @@ export function BlockTable({
             <tr>
               <Header title="No" field="block_code" align="center" />
 
-              <Header title="Block" field="block_code" />
+              <Header title="Block Code - Block Name" field="block_code" />
 
-              <Header title="Estate" field="estate" />
+              <Header title="Estate - AMA" field="estate" />
 
               <Header title="Division" field="division" align="center" />
 

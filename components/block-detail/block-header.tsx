@@ -53,7 +53,7 @@ export function BlockHeader({ block }: Props) {
 
             <div className="space-y-6">
               <Link
-                href="/dashboard/blocks"
+                href="/blocks"
                 className="
                   inline-flex
                   items-center

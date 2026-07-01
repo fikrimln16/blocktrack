@@ -35,7 +35,7 @@ export function BlockMap({ blocks, selectedBlock, onSelect }: Props) {
       </div>
 
       <div className="relative h-[650px]">
-        <SelectionInfo block={selectedBlock} />
+        {/* <SelectionInfo block={selectedBlock} /> */}
 
         <BlockLeafletMap
           blocks={blocks}

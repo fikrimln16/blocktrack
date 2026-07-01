@@ -19,10 +19,10 @@ export function TopVisitors({ visitors }: Props) {
         </div>
 
         <div>
-          <h2 className="text-lg font-semibold">Top Inspectors</h2>
+          <h2 className="text-lg font-semibold">Top Visitors</h2>
 
           <p className="text-sm text-slate-500">
-            Inspectors with the highest number of visits.
+            Visitors with the highest number of visits.
           </p>
         </div>
       </div>

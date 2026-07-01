@@ -80,12 +80,14 @@ export function Sidebar() {
       <button
         onClick={() => setOpen(true)}
         className="
-          fixed left-4 top-4 z-[9999]
+          fixed right-4 top-4 z-[9999]
           flex h-11 w-11 items-center justify-center
           rounded-xl
           bg-blue-600
           text-white
           shadow-lg
+          transition
+          hover:bg-blue-700
           lg:hidden
         "
       >
@@ -99,7 +101,7 @@ export function Sidebar() {
           onClick={() => setOpen(false)}
           className="
             fixed inset-0 z-[9998]
-            bg-black/50
+            bg-slate-900/50
             backdrop-blur-sm
             lg:hidden
           "
@@ -110,12 +112,13 @@ export function Sidebar() {
 
       <aside
         className={`
-          fixed top-0 left-0 z-[9999]
-          h-screen w-[280px]
+          fixed top-0 right-0 z-[9999]
+          h-screen w-[300px] max-w-[90vw]
           bg-[#081A37]
-          transition-all duration-300
+          shadow-2xl
+          transition-transform duration-300 ease-in-out
           lg:hidden
-          ${open ? "translate-x-0" : "-translate-x-full"}
+          ${open ? "translate-x-0" : "translate-x-full"}
         `}
       >
         <SidebarContent pathname={pathname} close={() => setOpen(false)} />
@@ -169,8 +172,17 @@ function SidebarContent({
         </div>
 
         {close && (
-          <button onClick={close} className="text-white">
-            <X />
+          <button
+            onClick={close}
+            className="
+              rounded-xl
+              p-2
+              text-white
+              transition
+              hover:bg-white/10
+            "
+          >
+            <X size={22} />
           </button>
         )}
       </div>
