@@ -8,6 +8,8 @@ import { Visit } from "@/types/visit";
 
 import { createVisit, createVisitPhoto } from "@/repositories/visit.repository";
 
+import crypto from "crypto";
+
 export async function getBlockVisits(blockId: number): Promise<Visit[]> {
   const [rows] = await db.query<RowDataPacket[]>(
     `
@@ -106,10 +108,23 @@ export async function saveVisit(visit: VisitPayload, photos: File[]) {
 
     for (const photo of photos) {
       const bytes = await photo.arrayBuffer();
-
       const buffer = Buffer.from(bytes);
 
-      const fileName = `${Date.now()}-${photo.name.replace(/\s+/g, "-")}`;
+      const ext = path.extname(photo.name).toLowerCase();
+
+      const now = new Date();
+
+      const timestamp =
+        `${now.getFullYear()}` +
+        `${String(now.getMonth() + 1).padStart(2, "0")}` +
+        `${String(now.getDate()).padStart(2, "0")}_` +
+        `${String(now.getHours()).padStart(2, "0")}` +
+        `${String(now.getMinutes()).padStart(2, "0")}` +
+        `${String(now.getSeconds()).padStart(2, "0")}`;
+
+      const random = crypto.randomBytes(3).toString("hex");
+
+      const fileName = `visit_${timestamp}_${random}${ext}`;
 
       const filePath = path.join(uploadDir, fileName);
 
