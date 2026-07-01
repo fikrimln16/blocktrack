@@ -143,19 +143,13 @@ export function VisitHistory({ visits, photos }: Props) {
         <VisitEmpty />
       ) : (
         <div className="divide-y divide-slate-200">
-          {visits.map((visit) => {
-            const visitPhotos = photos.filter(
-              (photo) => photo.visit_id === visit.id,
-            );
-
-            return (
-              <VisitHistoryItem
-                key={visit.id}
-                visit={visit}
-                photos={visitPhotos}
-              />
-            );
-          })}
+          {visits.map((visit) => (
+            <VisitHistoryItem
+              key={visit.id}
+              visit={visit}
+              photos={photos.filter((photo) => photo.visit_id === visit.id)}
+            />
+          ))}
         </div>
       )}
     </div>

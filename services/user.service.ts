@@ -30,21 +30,21 @@ interface CreateUserPayload {
 export async function getUsers(): Promise<UserOption[]> {
   const [rows] = await db.query<RowDataPacket[]>(
     `
-      SELECT
-        id,
-        name,
-        email,
-        role,
-        photo
-      FROM users
-      ORDER BY name ASC
+    SELECT
+      id,
+      name,
+      email,
+      role,
+      photo
+    FROM users
+    ORDER BY name ASC
     `,
   );
 
   return (rows as UserOption[]).map((user) => ({
     ...user,
     photo: user.photo
-      ? `/uploads/photos/${user.photo}`
+      ? `/api/storage/uploads/photos/${user.photo}`
       : "/images/default-avatar.jpg",
   }));
 }
@@ -58,7 +58,6 @@ export async function createUser(payload: CreateUserPayload, photo?: File) {
   try {
     await connection.beginTransaction();
 
-    // Validation
     if (!payload.name.trim()) {
       throw new Error("Visitor name is required.");
     }
@@ -66,7 +65,12 @@ export async function createUser(payload: CreateUserPayload, photo?: File) {
     let photoName: string | null = null;
 
     if (photo) {
-      const uploadDir = path.join(process.cwd(), "public", "uploads", "photos");
+      const uploadDir = path.join(
+        process.cwd(),
+        "storage",
+        "uploads",
+        "photos",
+      );
 
       await fs.mkdir(uploadDir, {
         recursive: true,
@@ -74,18 +78,25 @@ export async function createUser(payload: CreateUserPayload, photo?: File) {
 
       const ext = path.extname(photo.name).toLowerCase();
 
-      const fileName = `user_${Date.now()}_${crypto
-        .randomBytes(4)
-        .toString("hex")}${ext}`;
+      const now = new Date();
+
+      const timestamp =
+        `${now.getFullYear()}` +
+        `${String(now.getMonth() + 1).padStart(2, "0")}` +
+        `${String(now.getDate()).padStart(2, "0")}_` +
+        `${String(now.getHours()).padStart(2, "0")}` +
+        `${String(now.getMinutes()).padStart(2, "0")}` +
+        `${String(now.getSeconds()).padStart(2, "0")}`;
+
+      const random = crypto.randomBytes(4).toString("hex");
+
+      photoName = `user_${timestamp}_${random}${ext}`;
 
       const bytes = await photo.arrayBuffer();
 
       const buffer = Buffer.from(bytes);
 
-      await fs.writeFile(path.join(uploadDir, fileName), buffer);
-
-      // Simpan HANYA nama file ke database
-      photoName = fileName;
+      await fs.writeFile(path.join(uploadDir, photoName), buffer);
     }
 
     const id = await insertUser(connection, {
@@ -109,7 +120,7 @@ export async function createUser(payload: CreateUserPayload, photo?: File) {
       employee_id: payload.employee_id.trim(),
       joined_at: payload.joined_at,
       photo: photoName
-        ? `/uploads/photos/${photoName}`
+        ? `/api/storage/uploads/photos/${photoName}`
         : "/images/default-avatar.jpg",
     };
   } catch (error) {

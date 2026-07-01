@@ -54,21 +54,17 @@ export async function getBlockVisits(blockId: number): Promise<Visit[]> {
     [blockId],
   );
 
-  const visits = rows as Visit[];
+  return (rows as Visit[]).map((visit) => ({
+    ...visit,
 
-  for (const visit of visits) {
-    visit.photos = await getVisitPhotos(visit.id);
+    // Tidak lagi mengambil foto satu per satu
+    photos: [],
 
-    if (visit.inspector_photo) {
-      if (!visit.inspector_photo.startsWith("/")) {
-        visit.inspector_photo = `/uploads/photos/${visit.inspector_photo}`;
-      }
-    } else {
-      visit.inspector_photo = "/images/default-avatar.jpg";
-    }
-  }
-
-  return visits;
+    // URL avatar inspector
+    inspector_photo: visit.inspector_photo
+      ? `/api/storage/uploads/photos/${visit.inspector_photo}`
+      : "/images/default-avatar.jpg",
+  }));
 }
 
 interface VisitPayload {
