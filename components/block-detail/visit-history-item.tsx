@@ -118,26 +118,38 @@ export function VisitHistoryItem({ visit }: Props) {
               </p>
 
               <div className="flex flex-wrap gap-3">
-                {visit.photos.slice(0, 4).map((photo) => (
-                  <img
-                    key={photo.id}
-                    src={photo.photo_url}
-                    alt="Visit"
-                    className="
-                  h-20
-                  w-20
-                  rounded-xl
-                  border
-                  border-slate-200
-                  object-cover
-                  shadow-sm
-                  transition
-                  duration-200
-                  hover:scale-105
-                  group-hover:shadow-md
-                "
-                  />
-                ))}
+                {visit.photos.slice(0, 4).map((photo) => {
+                  const imageUrl = photo.photo_url.startsWith("/")
+                    ? photo.photo_url
+                    : `/${photo.photo_url}`;
+
+                  return (
+                    <Image
+                      key={photo.id}
+                      src={imageUrl}
+                      alt="Visit Documentation"
+                      width={80}
+                      height={80}
+                      unoptimized
+                      onError={() => {
+                        console.error("Failed:", imageUrl);
+                      }}
+                      className="
+                        h-20
+                        w-20
+                        rounded-xl
+                        border
+                        border-slate-200
+                        object-cover
+                        shadow-sm
+                        transition
+                        duration-200
+                        hover:scale-105
+                        group-hover:shadow-md
+                      "
+                    />
+                  );
+                })}
 
                 {visit.total_photos > 4 && (
                   <div
