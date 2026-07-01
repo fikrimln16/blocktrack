@@ -8,6 +8,7 @@ import { BlockDetailMap } from "@/components/block-detail/block-detail-map";
 import { VisitHistory } from "@/components/block-detail/visit-history";
 
 import { getBlockVisits } from "@/services/visit.service";
+import { getBlockPhotos } from "@/services/block-detail.service";
 
 interface Props {
   params: Promise<{
@@ -18,9 +19,10 @@ interface Props {
 export default async function BlockDetailPage({ params }: Props) {
   const { id } = await params;
 
-  const [block, visits] = await Promise.all([
+  const [block, visits, photos] = await Promise.all([
     getBlockDetail(Number(id)),
     getBlockVisits(Number(id)),
+    getBlockPhotos(Number(id)),
   ]);
 
   if (!block) {
@@ -44,7 +46,7 @@ export default async function BlockDetailPage({ params }: Props) {
         </div>
 
         <div className="mt-6">
-          <VisitHistory visits={visits} />
+          <VisitHistory visits={visits} photos={photos} />
         </div>
 
         {/* <BlockSummary block={block} /> */}

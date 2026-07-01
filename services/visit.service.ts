@@ -95,12 +95,9 @@ export async function saveVisit(visit: VisitPayload, photos: File[]) {
   try {
     await connection.beginTransaction();
 
-    console.log("===== SAVE VISIT =====");
-    console.log(visit);
-
     const visitId = await createVisit(connection, visit);
 
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "photos");
+    const uploadDir = path.join(process.cwd(), "storage", "uploads", "photos");
 
     await fs.mkdir(uploadDir, {
       recursive: true,
@@ -108,6 +105,7 @@ export async function saveVisit(visit: VisitPayload, photos: File[]) {
 
     for (const photo of photos) {
       const bytes = await photo.arrayBuffer();
+
       const buffer = Buffer.from(bytes);
 
       const ext = path.extname(photo.name).toLowerCase();
@@ -122,17 +120,14 @@ export async function saveVisit(visit: VisitPayload, photos: File[]) {
         `${String(now.getMinutes()).padStart(2, "0")}` +
         `${String(now.getSeconds()).padStart(2, "0")}`;
 
-      const random = crypto.randomBytes(3).toString("hex");
+      const random = crypto.randomBytes(4).toString("hex");
 
       const fileName = `visit_${timestamp}_${random}${ext}`;
 
-      const filePath = path.join(uploadDir, fileName);
+      await fs.writeFile(path.join(uploadDir, fileName), buffer);
 
-      await fs.writeFile(filePath, buffer);
-
-      const photoUrl = `/uploads/photos/${fileName}`;
-
-      await createVisitPhoto(connection, visitId, photoUrl);
+      // Simpan nama file saja
+      await createVisitPhoto(connection, visitId, fileName);
     }
 
     await connection.commit();

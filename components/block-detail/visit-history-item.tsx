@@ -17,12 +17,14 @@ import {
 import { Visit } from "@/types/visit";
 
 import { VisitStatusBadge } from "./visit-status-badge";
+import { VisitPhoto } from "@/services/block-detail.service";
 
 interface Props {
   visit: Visit;
+  photos: VisitPhoto[];
 }
 
-export function VisitHistoryItem({ visit }: Props) {
+export function VisitHistoryItem({ visit, photos }: Props) {
   return (
     <Link
       href={`/visits/${visit.id}`}
@@ -111,65 +113,56 @@ export function VisitHistoryItem({ visit }: Props) {
           </div>
 
           {/* Photo Gallery */}
-          {visit.photos && visit.photos.length > 0 && (
+          {photos.length > 0 && (
             <div className="mt-5">
               <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
                 Documentation
               </p>
 
               <div className="flex flex-wrap gap-3">
-                {visit.photos.slice(0, 4).map((photo) => {
-                  const imageUrl = photo.photo_url.startsWith("/")
-                    ? photo.photo_url
-                    : `/${photo.photo_url}`;
+                {photos.slice(0, 4).map((photo) => (
+                  <Image
+                    key={photo.id}
+                    src={photo.photo_url}
+                    alt="Visit Documentation"
+                    width={80}
+                    height={80}
+                    unoptimized
+                    className="
+            h-20
+            w-20
+            rounded-xl
+            border
+            border-slate-200
+            object-cover
+            shadow-sm
+            transition
+            duration-200
+            hover:scale-105
+            group-hover:shadow-md
+          "
+                  />
+                ))}
 
-                  return (
-                    <Image
-                      key={photo.id}
-                      src={imageUrl}
-                      alt="Visit Documentation"
-                      width={80}
-                      height={80}
-                      unoptimized
-                      onError={() => {
-                        console.error("Failed:", imageUrl);
-                      }}
-                      className="
-                        h-20
-                        w-20
-                        rounded-xl
-                        border
-                        border-slate-200
-                        object-cover
-                        shadow-sm
-                        transition
-                        duration-200
-                        hover:scale-105
-                        group-hover:shadow-md
-                      "
-                    />
-                  );
-                })}
-
-                {visit.total_photos > 4 && (
+                {photos.length > 4 && (
                   <div
                     className="
-                  flex
-                  h-20
-                  w-20
-                  items-center
-                  justify-center
-                  rounded-xl
-                  border
-                  border-dashed
-                  border-slate-300
-                  bg-slate-100
-                  text-sm
-                  font-semibold
-                  text-slate-600
-                "
+            flex
+            h-20
+            w-20
+            items-center
+            justify-center
+            rounded-xl
+            border
+            border-dashed
+            border-slate-300
+            bg-slate-100
+            text-sm
+            font-semibold
+            text-slate-600
+          "
                   >
-                    +{visit.total_photos - 4}
+                    +{photos.length - 4}
                   </div>
                 )}
               </div>
