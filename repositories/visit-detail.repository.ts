@@ -103,7 +103,10 @@ export async function getVisitDetail(id: number): Promise<VisitDetail> {
   const photos: VisitPhoto[] = photoRows.map((photo) => ({
     id: photo.id,
     visit_id: photo.visit_id,
-    photo_url: photo.photo_url,
+
+    // photo_url di database hanya nama file
+    photo_url: `/api/storage/uploads/photos/${photo.photo_url}`,
+
     category: photo.category,
     created_at: photo.created_at,
   }));
@@ -115,25 +118,23 @@ export async function getVisitDetail(id: number): Promise<VisitDetail> {
     original_name: attachment.original_name,
     file_name: attachment.file_name,
 
-    file_url: attachment.file_url,
+    // file_url di database hanya nama file
+    file_url: `/api/storage/uploads/attachments/${attachment.file_url}`,
 
     file_type: attachment.file_type,
     file_extension: attachment.file_extension,
-
     file_size: attachment.file_size,
-
     category: attachment.category,
-
     uploaded_by: attachment.uploaded_by,
-
     created_at: attachment.created_at,
   }));
 
   return {
     ...visit,
 
+    // Foto inspector
     photo: visit.photo
-      ? `/uploads/photos/${visit.photo}`
+      ? `/api/storage/uploads/photos/${visit.photo}`
       : "/images/default-avatar.jpg",
 
     polygon:
