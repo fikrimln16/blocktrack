@@ -137,6 +137,14 @@ export function VisitInspector({
     }
   }
 
+  useEffect(() => {
+    return () => {
+      if (preview) {
+        URL.revokeObjectURL(preview);
+      }
+    };
+  }, [preview]);
+
   return (
     <div className="space-y-4 border-b border-slate-200 pb-8">
       <div>
@@ -174,6 +182,7 @@ export function VisitInspector({
                 alt={selected.name}
                 width={48}
                 height={48}
+                unoptimized
                 className="h-12 w-12 rounded-full border border-slate-200 object-cover"
               />
 
@@ -267,10 +276,13 @@ export function VisitInspector({
                   `}
                 >
                   {/* PERBAIKAN DI SINI */}
-                  <img
-                    src={preview}
+                  <Image
+                    src={user.photo || "/images/default-avatar.jpg"}
                     alt={user.name}
-                    className="h-12 w-12 rounded-full border object-cover"
+                    width={48}
+                    height={48}
+                    unoptimized
+                    className="h-12 w-12 rounded-full border border-slate-200 object-cover"
                   />
 
                   <div className="flex-1 text-left">
@@ -355,11 +367,23 @@ export function VisitInspector({
         </button>
       </div>
       {showCreateInspector && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-xl rounded-3xl bg-white shadow-2xl">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-3 sm:p-6">
+          <div
+            className="
+        flex
+        w-full
+        max-w-2xl
+        max-h-[92vh]
+        flex-col
+        overflow-hidden
+        rounded-3xl
+        bg-white
+        shadow-2xl
+      "
+          >
             {/* Header */}
-            <div className="border-b border-slate-200 px-6 py-5">
-              <h3 className="text-xl font-bold text-slate-900">
+            <div className="border-b border-slate-200 px-5 py-4 sm:px-6 sm:py-5">
+              <h3 className="text-lg font-bold text-slate-900 sm:text-xl">
                 Add New Visitor
               </h3>
 
@@ -369,192 +393,289 @@ export function VisitInspector({
             </div>
 
             {/* Body */}
-            <div className="space-y-6 p-6">
-              {/* Upload Photo */}
-              <div className="flex flex-col items-center">
-                <div className="relative">
-                  <img
-                    src="/images/default-avatar.jpg"
-                    alt="Preview"
-                    className="h-28 w-28 rounded-full border-4 border-slate-200 object-cover"
-                  />
-
-                  <label
-                    className="
-                absolute
-                bottom-0
-                right-0
-                cursor-pointer
-                rounded-full
-                bg-blue-600
-                px-3
-                py-2
-                text-xs
-                font-medium
-                text-white
-                shadow-lg
-              "
-                  >
-                    Upload
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-
-                        if (!file) return;
-
-                        setPhoto(file);
-
-                        setPreview(URL.createObjectURL(file));
-                      }}
+            <div className="flex-1 overflow-y-auto p-5 sm:p-6">
+              <div className="space-y-6">
+                {/* Photo */}
+                <div className="flex flex-col items-center">
+                  <div className="relative">
+                    <Image
+                      src={preview || "/images/default-avatar.jpg"}
+                      alt="Preview"
+                      width={120}
+                      height={120}
+                      className="
+                        h-28
+                        w-28
+                        rounded-full
+                        border-4
+                        border-slate-200
+                        object-cover
+                      "
                     />
-                  </label>
+
+                    <label
+                      className="
+                  absolute
+                  bottom-0
+                  right-0
+                  cursor-pointer
+                  rounded-full
+                  bg-blue-600
+                  px-3
+                  py-2
+                  text-xs
+                  font-medium
+                  text-white
+                  shadow-lg
+                  transition
+                  hover:bg-blue-700
+                "
+                    >
+                      Upload
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+
+                          if (!file) return;
+
+                          setPhoto(file);
+
+                          if (preview) {
+                            URL.revokeObjectURL(preview);
+                          }
+
+                          setPreview(URL.createObjectURL(file));
+                        }}
+                      />
+                    </label>
+                  </div>
+
+                  <p className="mt-3 text-center text-xs text-slate-400">
+                    JPG / PNG / WEBP
+                    <br />
+                    Maximum 5 MB
+                  </p>
                 </div>
 
-                <p className="mt-3 text-xs text-slate-400">
-                  JPG, PNG (Max 5 MB)
-                </p>
-              </div>
+                {/* Form */}
+                <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                  <div className="md:col-span-2">
+                    <label className="mb-2 block text-sm font-medium">
+                      Full Name *
+                    </label>
 
-              {/* Form */}
-              <div className="grid gap-5 md:grid-cols-2">
-                <div className="md:col-span-2">
-                  <label className="mb-2 block text-sm font-medium">
-                    Full Name *
-                  </label>
+                    <input
+                      type="text"
+                      value={visitor.name}
+                      onChange={(e) =>
+                        setVisitor((prev) => ({
+                          ...prev,
+                          name: e.target.value,
+                        }))
+                      }
+                      placeholder="Visitor Name"
+                      className="
+                  w-full
+                  rounded-xl
+                  border
+                  border-slate-200
+                  px-4
+                  py-3
+                  outline-none
+                  transition
+                  focus:border-blue-500
+                "
+                    />
+                  </div>
 
-                  <input
-                    type="text"
-                    value={visitor.name}
-                    onChange={(e) =>
-                      setVisitor((prev) => ({
-                        ...prev,
-                        name: e.target.value,
-                      }))
-                    }
-                    placeholder="Visitor Name"
-                    className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-blue-500"
-                  />
-                </div>
+                  <div>
+                    <label className="mb-2 block text-sm font-medium">
+                      Employee ID
+                    </label>
 
-                <div>
-                  <label className="mb-2 block text-sm font-medium">
-                    Employee ID
-                  </label>
+                    <input
+                      type="text"
+                      value={visitor.employee_id}
+                      onChange={(e) =>
+                        setVisitor((prev) => ({
+                          ...prev,
+                          employee_id: e.target.value,
+                        }))
+                      }
+                      placeholder="EMP0001"
+                      className="
+                  w-full
+                  rounded-xl
+                  border
+                  border-slate-200
+                  px-4
+                  py-3
+                  outline-none
+                  transition
+                  focus:border-blue-500
+                "
+                    />
+                  </div>
 
-                  <input
-                    type="text"
-                    value={visitor.employee_id}
-                    onChange={(e) =>
-                      setVisitor((prev) => ({
-                        ...prev,
-                        employee_id: e.target.value,
-                      }))
-                    }
-                    placeholder="EMP0001"
-                    className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-blue-500"
-                  />
-                </div>
+                  <div>
+                    <label className="mb-2 block text-sm font-medium">
+                      Role *
+                    </label>
 
-                <div>
-                  <label className="mb-2 block text-sm font-medium">
-                    Role *
-                  </label>
+                    <select
+                      value={visitor.role}
+                      onChange={(e) =>
+                        setVisitor((prev) => ({
+                          ...prev,
+                          role: e.target.value,
+                        }))
+                      }
+                      className="
+                  w-full
+                  rounded-xl
+                  border
+                  border-slate-200
+                  px-4
+                  py-3
+                  outline-none
+                  transition
+                  focus:border-blue-500
+                "
+                    >
+                      <option value="">Select Role</option>
+                      <option>Supervisor</option>
+                      <option>Assistant</option>
+                      <option>Inspector</option>
+                      <option>Foreman</option>
+                      <option>Manager</option>
+                    </select>
+                  </div>
 
-                  <select
-                    value={visitor.role}
-                    onChange={(e) =>
-                      setVisitor((prev) => ({
-                        ...prev,
-                        role: e.target.value,
-                      }))
-                    }
-                    className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-blue-500"
-                  >
-                    <option value="">Select Role</option>
-                    <option>Supervisor</option>
-                    <option>Assistant</option>
-                    <option>Inspector</option>
-                    <option>Foreman</option>
-                    <option>Manager</option>
-                  </select>
-                </div>
+                  <div>
+                    <label className="mb-2 block text-sm font-medium">
+                      Email
+                    </label>
 
-                <div>
-                  <label className="mb-2 block text-sm font-medium">
-                    Email
-                  </label>
+                    <input
+                      type="email"
+                      value={visitor.email}
+                      onChange={(e) =>
+                        setVisitor((prev) => ({
+                          ...prev,
+                          email: e.target.value,
+                        }))
+                      }
+                      placeholder="email@example.com"
+                      className="
+                  w-full
+                  rounded-xl
+                  border
+                  border-slate-200
+                  px-4
+                  py-3
+                  outline-none
+                  transition
+                  focus:border-blue-500
+                "
+                    />
+                  </div>
 
-                  <input
-                    type="email"
-                    value={visitor.email}
-                    onChange={(e) =>
-                      setVisitor((prev) => ({
-                        ...prev,
-                        email: e.target.value,
-                      }))
-                    }
-                    placeholder="email@example.com"
-                    className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-blue-500"
-                  />
-                </div>
+                  <div>
+                    <label className="mb-2 block text-sm font-medium">
+                      Phone Number
+                    </label>
 
-                <div>
-                  <label className="mb-2 block text-sm font-medium">
-                    Phone Number
-                  </label>
+                    <input
+                      type="text"
+                      value={visitor.phone}
+                      onChange={(e) =>
+                        setVisitor((prev) => ({
+                          ...prev,
+                          phone: e.target.value,
+                        }))
+                      }
+                      placeholder="+62..."
+                      className="
+                  w-full
+                  rounded-xl
+                  border
+                  border-slate-200
+                  px-4
+                  py-3
+                  outline-none
+                  transition
+                  focus:border-blue-500
+                "
+                    />
+                  </div>
 
-                  <input
-                    type="text"
-                    value={visitor.phone}
-                    onChange={(e) =>
-                      setVisitor((prev) => ({
-                        ...prev,
-                        phone: e.target.value,
-                      }))
-                    }
-                    placeholder="+62..."
-                    className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-blue-500"
-                  />
-                </div>
+                  <div className="md:col-span-2">
+                    <label className="mb-2 block text-sm font-medium">
+                      Join Date
+                    </label>
 
-                <div className="md:col-span-2">
-                  <label className="mb-2 block text-sm font-medium">
-                    Join Date
-                  </label>
-
-                  <input
-                    type="date"
-                    value={visitor.joined_at}
-                    onChange={(e) =>
-                      setVisitor((prev) => ({
-                        ...prev,
-                        joined_at: e.target.value,
-                      }))
-                    }
-                    className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-blue-500"
-                  />
+                    <input
+                      type="date"
+                      value={visitor.joined_at}
+                      onChange={(e) =>
+                        setVisitor((prev) => ({
+                          ...prev,
+                          joined_at: e.target.value,
+                        }))
+                      }
+                      className="
+                  w-full
+                  rounded-xl
+                  border
+                  border-slate-200
+                  px-4
+                  py-3
+                  outline-none
+                  transition
+                  focus:border-blue-500
+                "
+                    />
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Footer */}
-            <div className="flex justify-end gap-3 border-t border-slate-200 px-6 py-5">
+            <div
+              className="
+          sticky
+          bottom-0
+          flex
+          flex-col-reverse
+          gap-3
+          border-t
+          border-slate-200
+          bg-white
+          p-4
+          sm:flex-row
+          sm:justify-end
+          sm:px-6
+        "
+            >
               <button
                 type="button"
                 onClick={() => setShowCreateInspector(false)}
                 className="
-                  rounded-xl
-                  border
-                  border-slate-300
-                  px-5
-                  py-3
-                  font-medium
-                  text-slate-600
-                  hover:bg-slate-100
-                "
+            w-full
+            rounded-xl
+            border
+            border-slate-300
+            px-5
+            py-3
+            font-medium
+            text-slate-600
+            transition
+            hover:bg-slate-100
+            sm:w-auto
+          "
               >
                 Cancel
               </button>
@@ -564,17 +685,19 @@ export function VisitInspector({
                 disabled={saving}
                 onClick={handleCreateVisitor}
                 className="
-                  rounded-xl
-                  bg-blue-600
-                  px-6
-                  py-3
-                  font-medium
-                  text-white
-                  transition
-                  hover:bg-blue-700
-                  disabled:cursor-not-allowed
-                  disabled:bg-slate-400
-                "
+            w-full
+            rounded-xl
+            bg-blue-600
+            px-6
+            py-3
+            font-medium
+            text-white
+            transition
+            hover:bg-blue-700
+            disabled:cursor-not-allowed
+            disabled:bg-slate-400
+            sm:w-auto
+          "
               >
                 {saving ? "Saving..." : "Save Visitor"}
               </button>
