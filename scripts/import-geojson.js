@@ -16,7 +16,6 @@ async function run() {
 
     console.log("✅ Connected MySQL");
 
-    // membaca file geojson
     const filePath = path.join(__dirname, "../geojson/blok.geojson");
 
     const raw = fs.readFileSync(filePath, "utf8");
@@ -43,7 +42,12 @@ async function run() {
 
       if (!amaId) {
         const [rows] = await db.execute(
-          "SELECT id FROM amas WHERE name=? LIMIT 1",
+          `
+          SELECT id
+          FROM amas
+          WHERE name = ?
+          LIMIT 1
+          `,
           [p.AMA],
         );
 
@@ -55,8 +59,12 @@ async function run() {
           const [result] = await db.execute(
             `
             INSERT INTO amas
-            (code,name)
-            VALUES (?,?)
+            (
+              code,
+              name
+            )
+            VALUES
+            (?,?)
             `,
             [code, p.AMA],
           );
@@ -80,8 +88,8 @@ async function run() {
           `
           SELECT id
           FROM estates
-          WHERE ama_id=?
-          AND name=?
+          WHERE ama_id = ?
+          AND name = ?
           LIMIT 1
           `,
           [amaId, p.ESTATE],
@@ -94,9 +102,9 @@ async function run() {
             `
             INSERT INTO estates
             (
-                ama_id,
-                code,
-                name
+              ama_id,
+              code,
+              name
             )
             VALUES
             (?,?,?)
@@ -114,74 +122,50 @@ async function run() {
       // BLOCK
       //-----------------------------------
 
-      const geometry = JSON.stringify(feature.geometry);
-
       await db.execute(
         `
-INSERT INTO blocks
-(
-    estate_id,
+        INSERT INTO blocks
+        (
+          estate_id,
 
-    block_code,
-    block_name,
+          block_code,
 
-    status,
+          status,
 
-    division,
+          division,
 
-    planting_year,
+          planting_year,
 
-    area_ha,
+          area_ha,
 
-    ba_code,
+          geometry
+        )
 
-    ba_initial,
+        VALUES
+        (
+          ?, ?, ?, ?, ?, ?, ?
+        )
 
-    unit,
+        ON DUPLICATE KEY UPDATE
 
-    remarks,
-
-    geometry
-)
-
-VALUES
-(
-    ?,?,?,?,?,?,?,?,?,?,?,?
-)
-
-ON DUPLICATE KEY UPDATE
-
-    status = VALUES(status),
-    division = VALUES(division),
-    planting_year = VALUES(planting_year),
-    area_ha = VALUES(area_ha),
-    ba_code = VALUES(ba_code),
-    ba_initial = VALUES(ba_initial),
-    unit = VALUES(unit),
-    remarks = VALUES(remarks),
-    geometry = VALUES(geometry)
-`,
+          status = VALUES(status),
+          division = VALUES(division),
+          planting_year = VALUES(planting_year),
+          area_ha = VALUES(area_ha),
+          geometry = VALUES(geometry)
+        `,
         [
           estateId,
 
-          p.BlockCode,
-          p.BLOK,
+          String(p.BlockCode).trim(),
 
-          p.STATUS,
+          p.STATUS ?? null,
 
-          p.DIVISI,
+          p.DIVISI ? Number(p.DIVISI) : null,
 
-          p.PYEAR,
+          p.PYEAR && Number(p.PYEAR) > 0 ? Number(p.PYEAR) : null,
 
-          p.HA,
-
-          p.BACode,
-
-          p.BAInitial,
-
-          p.Unit,
-
-          p.KET,
+          p.HA ? Number(p.HA) : 0,
 
           JSON.stringify(feature.geometry),
         ],
