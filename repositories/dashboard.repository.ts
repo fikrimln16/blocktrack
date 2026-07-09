@@ -138,7 +138,7 @@ export async function getRecentActivitiesRepository(): Promise<
   return (rows as RecentActivity[]).map((activity) => ({
     ...activity,
     photo: activity.photo
-      ? `/uploads/photos/${activity.photo}`
+      ? `/api/storage/uploads/photos/${activity.photo}`
       : "/images/default-avatar.jpg",
   }));
 }
