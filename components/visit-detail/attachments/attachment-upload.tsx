@@ -59,8 +59,7 @@ export function AttachmentUpload({ visitId }: Props) {
 
   const handleUpload = async () => {
     if (attachments.length === 0) {
-      alert("Please select attachment.");
-
+      alert("Please select at least one attachment.");
       return;
     }
 
@@ -81,10 +80,25 @@ export function AttachmentUpload({ visitId }: Props) {
         body: formData,
       });
 
-      const result = await response.json();
+      const contentType = response.headers.get("content-type") ?? "";
+
+      let result: any;
+
+      if (contentType.includes("application/json")) {
+        result = await response.json();
+      } else {
+        const html = await response.text();
+
+        console.error("Server Response:");
+        console.error(html);
+
+        throw new Error(
+          "API tidak mengembalikan JSON. Cek route attachment (404 / 500).",
+        );
+      }
 
       if (!response.ok) {
-        throw new Error(result.message);
+        throw new Error(result.message || "Upload failed.");
       }
 
       setAttachments([]);
@@ -92,7 +106,11 @@ export function AttachmentUpload({ visitId }: Props) {
 
       router.refresh();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Upload failed");
+      console.error(err);
+
+      alert(
+        err instanceof Error ? err.message : "Failed to upload attachment.",
+      );
     } finally {
       setLoading(false);
     }
