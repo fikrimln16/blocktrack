@@ -89,7 +89,7 @@ export async function getTopVisitorsRepository(): Promise<TopVisitor[]> {
   return (rows as TopVisitor[]).map((user) => ({
     ...user,
     photo: user.photo
-      ? `/uploads/photos/${user.photo}`
+      ? `/api/storage/uploads/photos/${user.photo}`
       : "/images/default-avatar.jpg",
   }));
 }
