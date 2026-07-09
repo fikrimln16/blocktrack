@@ -12,6 +12,8 @@ export async function POST(request: NextRequest, { params }: Context) {
   try {
     const { id } = await params;
 
+    console.log("Visit ID:", id);
+
     const visitId = Number(id);
 
     if (!Number.isInteger(visitId) || visitId <= 0) {
