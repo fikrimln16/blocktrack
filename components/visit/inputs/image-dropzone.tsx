@@ -1,83 +1,140 @@
 "use client";
 
-import { useCallback } from "react";
-import { useDropzone } from "react-dropzone";
-import { UploadCloud, ImageIcon } from "lucide-react";
+import { useRef } from "react";
+import { UploadCloud, Camera, ImageIcon } from "lucide-react";
 
 interface Props {
   onFiles: (files: File[]) => void;
 }
 
 export function ImageDropzone({ onFiles }: Props) {
-  const onDrop = useCallback(
-    (acceptedFiles: File[]) => {
-      const files = acceptedFiles.filter((file) => {
-        return (
-          file.type.startsWith("image/") && file.size <= 10 * 1024 * 1024 // Max 10 MB
-        );
+  const galleryInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+
+  function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const list = event.target.files;
+
+    if (!list) return;
+
+    const files = Array.from(list)
+      .filter((file) => {
+        if (!(file instanceof File)) return false;
+
+        if (!file.type.startsWith("image/")) return false;
+
+        if (file.size > 10 * 1024 * 1024) return false;
+
+        return true;
+      })
+      .map((file) => {
+        // Safari kadang nama file kosong
+        if (!file.name || file.name.trim() === "") {
+          const ext =
+            file.type === "image/png"
+              ? ".png"
+              : file.type === "image/webp"
+                ? ".webp"
+                : file.type === "image/heic"
+                  ? ".heic"
+                  : file.type === "image/heif"
+                    ? ".heif"
+                    : ".jpg";
+
+          return new File([file], `photo_${Date.now()}${ext}`, {
+            type: file.type || "image/jpeg",
+            lastModified: Date.now(),
+          });
+        }
+
+        return file;
       });
 
-      onFiles(files);
-    },
-    [onFiles],
-  );
+    onFiles(files);
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
-
-    multiple: true,
-
-    noKeyboard: true,
-
-    preventDropOnDocument: true,
-
-    useFsAccessApi: false,
-
-    accept: {
-      "image/*": [".jpg", ".jpeg", ".png", ".webp", ".heic", ".heif"],
-    },
-  });
+    // supaya bisa memilih file yang sama lagi
+    event.target.value = "";
+  }
 
   return (
-    <div
-      {...getRootProps()}
-      className={`
-        cursor-pointer
-        rounded-3xl
-        border-2
-        border-dashed
-        p-8
-        text-center
-        transition
-
-        ${
-          isDragActive
-            ? "border-blue-500 bg-blue-50"
-            : "border-slate-300 hover:border-blue-400 hover:bg-slate-50"
-        }
-      `}
-    >
+    <>
+      {/* Hidden Gallery */}
       <input
-        {...getInputProps({
-          accept: "image/*",
-          capture: "environment",
-        })}
+        ref={galleryInputRef}
+        type="file"
+        accept="image/*,.heic,.heif"
+        multiple
+        hidden
+        onChange={handleChange}
       />
 
-      <UploadCloud size={48} className="mx-auto text-blue-500" />
+      {/* Hidden Camera */}
+      <input
+        ref={cameraInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        hidden
+        onChange={handleChange}
+      />
 
-      <h3 className="mt-4 text-lg font-semibold">Upload Documentation</h3>
+      <div className="rounded-3xl border-2 border-dashed border-slate-300 bg-slate-50 p-8 text-center">
+        <UploadCloud size={52} className="mx-auto text-blue-600" />
 
-      <p className="mt-2 text-sm text-slate-500">
-        Tap here to choose photos or directly use the camera.
-      </p>
+        <h3 className="mt-4 text-lg font-semibold">Upload Documentation</h3>
 
-      <div className="mt-5 inline-flex items-center gap-2 rounded-xl bg-slate-100 px-4 py-2">
-        <ImageIcon size={18} />
-        JPG · PNG · WEBP · HEIC
+        <p className="mt-2 text-sm text-slate-500">
+          Choose a photo from your gallery or take one directly.
+        </p>
+
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
+          <button
+            type="button"
+            onClick={() => galleryInputRef.current?.click()}
+            className="
+              flex
+              items-center
+              justify-center
+              gap-2
+              rounded-xl
+              bg-blue-600
+              px-5
+              py-3
+              text-white
+              transition
+              hover:bg-blue-700
+            "
+          >
+            <ImageIcon size={18} />
+            Upload Gallery
+          </button>
+
+          <button
+            type="button"
+            onClick={() => cameraInputRef.current?.click()}
+            className="
+              flex
+              items-center
+              justify-center
+              gap-2
+              rounded-xl
+              border
+              border-slate-300
+              bg-white
+              px-5
+              py-3
+              transition
+              hover:bg-slate-100
+            "
+          >
+            <Camera size={18} />
+            Take Photo
+          </button>
+        </div>
+
+        <p className="mt-5 text-xs text-slate-400">
+          JPEG, PNG, WEBP, HEIC, HEIF • Maximum 10 MB per image
+        </p>
       </div>
-
-      <p className="mt-3 text-xs text-slate-400">Maximum 10 MB per image</p>
-    </div>
+    </>
   );
 }

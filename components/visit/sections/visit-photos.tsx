@@ -12,20 +12,59 @@ interface Props {
 
 export function VisitPhotos({ photos, setPhotos }: Props) {
   function handleFiles(files: File[]) {
-    const validFiles = files.filter((file) => {
-      if (!file.type.startsWith("image/")) {
-        return false;
-      }
+    const validFiles = files
+      .filter((file) => {
+        if (!(file instanceof File)) return false;
 
-      // Maksimal 10 MB
-      if (file.size > 10 * 1024 * 1024) {
-        return false;
-      }
+        if (file.size === 0) return false;
 
-      return true;
+        if (!file.type.startsWith("image/")) return false;
+
+        if (file.size > 10 * 1024 * 1024) return false;
+
+        return true;
+      })
+      .map((file) => {
+        // Safari kadang tidak memberi nama file hasil kamera
+        if (!file.name || file.name.trim() === "") {
+          const ext =
+            file.type === "image/png"
+              ? ".png"
+              : file.type === "image/webp"
+                ? ".webp"
+                : file.type === "image/heic"
+                  ? ".heic"
+                  : file.type === "image/heif"
+                    ? ".heif"
+                    : ".jpg";
+
+          return new File([file], `photo_${Date.now()}${ext}`, {
+            type: file.type || "image/jpeg",
+            lastModified: Date.now(),
+          });
+        }
+
+        return file;
+      });
+
+    setPhotos((prev) => {
+      const merged = [...prev, ...validFiles];
+
+      // Hilangkan file duplikat
+      const unique = merged.filter(
+        (file, index, self) =>
+          index ===
+          self.findIndex(
+            (f) =>
+              f.name === file.name &&
+              f.size === file.size &&
+              f.lastModified === file.lastModified,
+          ),
+      );
+
+      // Maksimal 20 foto
+      return unique.slice(0, 20);
     });
-
-    setPhotos((prev) => [...prev, ...validFiles]);
   }
 
   function removePhoto(index: number) {
@@ -49,6 +88,9 @@ export function VisitPhotos({ photos, setPhotos }: Props) {
 
       {/* Dropzone */}
       <ImageDropzone onFiles={handleFiles} />
+      <p className="mt-3 text-sm text-slate-500">
+        Maximum 20 photos • JPEG, PNG, WEBP, HEIC, HEIF • Max 10 MB each
+      </p>
 
       {/* Preview */}
       {photos.length > 0 ? (
@@ -92,31 +134,19 @@ interface PhotoCardProps {
 }
 
 function PhotoCard({ file, onDelete }: PhotoCardProps) {
-  /**
-   * Buat object URL hanya sekali.
-   * Sangat penting untuk Safari / iPhone agar
-   * tidak membuat URL baru setiap render.
-   */
-  const preview = useMemo(() => {
-    return URL.createObjectURL(file);
-  }, [file]);
+  const preview = useMemo(() => URL.createObjectURL(file), [file]);
 
-  /**
-   * Bersihkan object URL saat komponen dihapus.
-   */
   useEffect(() => {
-    return () => {
-      URL.revokeObjectURL(preview);
-    };
+    return () => URL.revokeObjectURL(preview);
   }, [preview]);
 
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md">
-      {/* Gunakan img untuk preview blob Safari */}
       <img
         src={preview}
-        alt={file.name}
+        alt={file.name || "Camera Photo"}
         loading="lazy"
+        draggable={false}
         className="h-52 w-full object-cover"
       />
 
@@ -128,7 +158,7 @@ function PhotoCard({ file, onDelete }: PhotoCardProps) {
         <div className="flex items-center justify-between text-xs text-slate-500">
           <span>{(file.size / 1024 / 1024).toFixed(2)} MB</span>
 
-          <span>{file.type || "image/jpeg"}</span>
+          <span>{file.type || "image"}</span>
         </div>
 
         <button

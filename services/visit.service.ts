@@ -1,14 +1,14 @@
-import { RowDataPacket } from "mysql2";
+import crypto from "crypto";
 import fs from "fs/promises";
 import path from "path";
+
+import { RowDataPacket } from "mysql2";
 
 import db from "@/lib/db";
 
 import { Visit } from "@/types/visit";
 
 import { createVisit, createVisitPhoto } from "@/repositories/visit.repository";
-
-import crypto from "crypto";
 
 export async function getBlockVisits(blockId: number): Promise<Visit[]> {
   const [rows] = await db.query<RowDataPacket[]>(
@@ -57,10 +57,8 @@ export async function getBlockVisits(blockId: number): Promise<Visit[]> {
   return (rows as Visit[]).map((visit) => ({
     ...visit,
 
-    // Tidak lagi mengambil foto satu per satu
     photos: [],
 
-    // URL avatar inspector
     inspector_photo: visit.inspector_photo
       ? `/api/storage/uploads/photos/${visit.inspector_photo}`
       : "/images/default-avatar.jpg",
@@ -88,23 +86,61 @@ interface VisitPayload {
 export async function saveVisit(visit: VisitPayload, photos: File[]) {
   const connection = await db.getConnection();
 
+  const uploadDir = path.join(process.cwd(), "storage", "uploads", "photos");
+
+  const uploadedFiles: string[] = [];
+
   try {
     await connection.beginTransaction();
 
     const visitId = await createVisit(connection, visit);
-
-    const uploadDir = path.join(process.cwd(), "storage", "uploads", "photos");
 
     await fs.mkdir(uploadDir, {
       recursive: true,
     });
 
     for (const photo of photos) {
+      if (!(photo instanceof File)) continue;
+
+      if (photo.size === 0) continue;
+
+      if (!photo.type.startsWith("image/")) continue;
+
       const bytes = await photo.arrayBuffer();
 
       const buffer = Buffer.from(bytes);
 
-      const ext = path.extname(photo.name).toLowerCase();
+      let ext = path.extname(photo.name).toLowerCase();
+
+      /**
+       * iPhone Take Photo kadang tidak mengirim extension.
+       */
+      if (!ext) {
+        switch (photo.type) {
+          case "image/jpeg":
+            ext = ".jpg";
+            break;
+
+          case "image/png":
+            ext = ".png";
+            break;
+
+          case "image/webp":
+            ext = ".webp";
+            break;
+
+          case "image/heic":
+            ext = ".heic";
+            break;
+
+          case "image/heif":
+            ext = ".heif";
+            break;
+
+          default:
+            ext = ".jpg";
+        }
+      }
 
       const now = new Date();
 
@@ -116,13 +152,16 @@ export async function saveVisit(visit: VisitPayload, photos: File[]) {
         `${String(now.getMinutes()).padStart(2, "0")}` +
         `${String(now.getSeconds()).padStart(2, "0")}`;
 
-      const random = crypto.randomBytes(4).toString("hex");
+      const random = crypto.randomBytes(6).toString("hex");
 
       const fileName = `visit_${timestamp}_${random}${ext}`;
 
-      await fs.writeFile(path.join(uploadDir, fileName), buffer);
+      const filePath = path.join(uploadDir, fileName);
 
-      // Simpan nama file saja
+      await fs.writeFile(filePath, buffer);
+
+      uploadedFiles.push(fileName);
+
       await createVisitPhoto(connection, visitId, fileName);
     }
 
@@ -131,6 +170,20 @@ export async function saveVisit(visit: VisitPayload, photos: File[]) {
     return visitId;
   } catch (error) {
     await connection.rollback();
+
+    /**
+     * Hapus file yang sudah terupload jika transaksi gagal.
+     */
+    await Promise.all(
+      uploadedFiles.map(async (file) => {
+        try {
+          await fs.unlink(path.join(uploadDir, file));
+        } catch {
+          // ignore
+        }
+      }),
+    );
+
     throw error;
   } finally {
     connection.release();
@@ -147,7 +200,7 @@ export async function getVisitPhotos(visitId: number): Promise<VisitPhoto[]> {
     `
     SELECT
       id,
-      photo_url
+      CONCAT('/api/storage/uploads/photos/', photo_url) AS photo_url
     FROM visit_photos
     WHERE visit_id = ?
     ORDER BY id ASC

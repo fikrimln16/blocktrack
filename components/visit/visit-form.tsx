@@ -63,76 +63,89 @@ export function VisitForm({ block, users }: Props) {
       setErrorMessage("");
       setSuccessMessage("");
 
-      // ==========================
-      // VALIDATION
-      // ==========================
-
+      // Validation
       if (!data.user_id) {
-        setErrorMessage("Please select an inspector.");
-        return;
+        throw new Error("Please select an inspector.");
       }
 
-      if (!data.latitude || !data.longitude) {
-        setErrorMessage("Please capture the GPS location.");
-        return;
+      if (data.latitude == null || data.longitude == null) {
+        throw new Error("Please capture the GPS location.");
       }
 
       if (photos.length === 0) {
-        setErrorMessage("Please upload at least one photo.");
-        return;
+        throw new Error("Please upload at least one photo.");
       }
 
-      // ==========================
-      // PAYLOAD
-      // ==========================
-
       const visitPayload = {
-        user_id: data.user_id,
-        block_id: block.id,
+        user_id: Number(data.user_id),
+        block_id: Number(block.id),
 
         visit_date: data.visit_date,
         visit_time: data.visit_time,
 
         weather: data.weather,
-        duration: data.duration,
+        duration: Number(data.duration),
 
-        latitude: data.latitude,
-        longitude: data.longitude,
-        accuracy: data.accuracy,
+        latitude: Number(data.latitude),
+        longitude: Number(data.longitude),
+        accuracy: data.accuracy != null ? Number(data.accuracy) : null,
 
-        notes: data.notes,
+        notes: data.notes ?? "",
       };
 
       const formData = new FormData();
 
       formData.append("visit", JSON.stringify(visitPayload));
 
-      photos.forEach((photo) => {
-        formData.append("photos", photo);
-      });
+      for (const file of photos) {
+        if (!(file instanceof File)) continue;
+
+        if (file.size === 0) continue;
+
+        let uploadFile = file;
+
+        /**
+         * Safari/iPhone kadang mengirim file tanpa nama.
+         */
+        if (!file.name || file.name.trim() === "") {
+          const ext =
+            file.type === "image/png"
+              ? ".png"
+              : file.type === "image/webp"
+                ? ".webp"
+                : file.type === "image/heic"
+                  ? ".heic"
+                  : file.type === "image/heif"
+                    ? ".heif"
+                    : ".jpg";
+
+          uploadFile = new File([file], `photo_${Date.now()}${ext}`, {
+            type: file.type || "image/jpeg",
+            lastModified: Date.now(),
+          });
+        }
+
+        formData.append("photos", uploadFile);
+      }
 
       const response = await fetch("/api/visits", {
         method: "POST",
         body: formData,
+        cache: "no-store",
       });
 
       const result = await response.json();
 
       if (!response.ok || !result.success) {
-        throw new Error(result.message ?? "Failed to save visit.");
+        throw new Error(result.message || "Failed to save visit.");
       }
 
       setSuccessMessage("Visit created successfully.");
 
-      console.log(result);
-
       setTimeout(() => {
         router.replace(`/blocks/${block.id}`);
         router.refresh();
-      }, 1500);
-
-      // TODO
-      // router.push(`/dashboard/visits/${result.visitId}`);
+      }, 1000);
     } catch (err) {
       console.error(err);
 
