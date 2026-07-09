@@ -1,3 +1,6 @@
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 
 import { DashboardSummary } from "@/components/dashboard/summary/dashboard-summary";
@@ -5,16 +8,21 @@ import { DashboardStatistics } from "@/components/dashboard/statistics/dashboard
 import { TopVisitors } from "@/components/dashboard/top-visitors/top-visitors";
 import { RecentActivityFeed } from "@/components/dashboard/recent-activity/recent-activity";
 
-import { getDashboardSummary } from "@/services/dashboard.service";
-import { getDashboardStatistics } from "@/services/dashboard.service";
-import { getTopVisitors } from "@/services/dashboard.service";
-import { getRecentActivities } from "@/services/dashboard.service";
+import {
+  getDashboardSummary,
+  getDashboardStatistics,
+  getTopVisitors,
+  getRecentActivities,
+} from "@/services/dashboard.service";
 
 export default async function DashboardPage() {
-  const summary = await getDashboardSummary();
-  const statistics = await getDashboardStatistics();
-  const topVisitors = await getTopVisitors();
-  const recentActivities = await getRecentActivities();
+  const [summary, statistics, topVisitors, recentActivities] =
+    await Promise.all([
+      getDashboardSummary(),
+      getDashboardStatistics(),
+      getTopVisitors(),
+      getRecentActivities(),
+    ]);
 
   return (
     <DashboardLayout>
