@@ -547,10 +547,9 @@ export function VisitInspector({
                     >
                       <option value="">Select Role</option>
                       <option>Supervisor</option>
-                      <option>Assistant</option>
-                      <option>Inspector</option>
-                      <option>Foreman</option>
                       <option>Manager</option>
+                      <option>Block Analyst</option>
+                      <option>Operation and Administration</option>
                     </select>
                   </div>
 
