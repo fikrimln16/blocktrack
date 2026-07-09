@@ -36,7 +36,7 @@ export async function uploadVisitAttachment(
 ) {
   const uploadDir = path.join(
     process.cwd(),
-    "public",
+    "storage",
     "uploads",
     "attachments",
   );
@@ -45,8 +45,8 @@ export async function uploadVisitAttachment(
     recursive: true,
   });
 
-  const results = [];
   const uploadedFiles: string[] = [];
+  const results = [];
 
   try {
     for (let i = 0; i < files.length; i++) {
@@ -66,7 +66,7 @@ export async function uploadVisitAttachment(
 
       const ext = path.extname(file.name).toLowerCase();
 
-      const mimeAllowed =
+      const allowed =
         ALLOWED_TYPES.includes(file.type) ||
         [
           ".pdf",
@@ -77,20 +77,26 @@ export async function uploadVisitAttachment(
           ".ppt",
           ".pptx",
           ".zip",
+          ".rar",
         ].includes(ext);
 
-      if (!mimeAllowed) {
+      if (!allowed) {
         throw new Error(`${file.name} is not supported.`);
       }
 
-      const safeDisplayName =
-        (displayNames[i] || file.name)
-          .trim()
-          .replace(/[<>:"/\\|?*\x00-\x1F]/g, "") || file.name;
+      const now = new Date();
 
-      const fileName = `attachment_${Date.now()}_${crypto
-        .randomBytes(6)
-        .toString("hex")}${ext}`;
+      const timestamp =
+        `${now.getFullYear()}` +
+        `${String(now.getMonth() + 1).padStart(2, "0")}` +
+        `${String(now.getDate()).padStart(2, "0")}_` +
+        `${String(now.getHours()).padStart(2, "0")}` +
+        `${String(now.getMinutes()).padStart(2, "0")}` +
+        `${String(now.getSeconds()).padStart(2, "0")}`;
+
+      const random = crypto.randomBytes(4).toString("hex");
+
+      const fileName = `attachment_${timestamp}_${random}${ext}`;
 
       const buffer = Buffer.from(await file.arrayBuffer());
 
@@ -98,14 +104,20 @@ export async function uploadVisitAttachment(
 
       uploadedFiles.push(fileName);
 
+      const displayName =
+        (displayNames[i] || file.name)
+          .trim()
+          .replace(/[<>:"/\\|?*\x00-\x1F]/g, "") || file.name;
+
       const attachment = await insertVisitAttachment({
         visit_id: visitId,
 
-        original_name: safeDisplayName,
+        original_name: displayName,
 
         file_name: fileName,
 
-        file_url: `/uploads/attachments/${fileName}`,
+        // Simpan NAMA FILE SAJA
+        file_url: fileName,
 
         file_type: file.type || "application/octet-stream",
 
@@ -121,7 +133,6 @@ export async function uploadVisitAttachment(
 
     return results;
   } catch (error) {
-    // hapus file yang sudah sempat tersimpan
     await Promise.all(
       uploadedFiles.map(async (file) => {
         try {
