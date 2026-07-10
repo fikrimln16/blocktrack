@@ -1,6 +1,22 @@
 import { RowDataPacket } from "mysql2";
 import { MultiPolygon } from "geojson";
 
+export interface BlockVisit {
+  id: number;
+
+  inspector: string;
+
+  visit_date: string;
+
+  visit_time: string;
+
+  latitude: number;
+
+  longitude: number;
+
+  weather: string;
+}
+
 export interface Block extends RowDataPacket {
   id: number;
 
@@ -35,5 +51,9 @@ export interface Block extends RowDataPacket {
   total_visit: number;
 
   total_photos: number;
+
   total_attachments: number;
+
+  // Riwayat seluruh kunjungan pada block
+  visits: BlockVisit[];
 }

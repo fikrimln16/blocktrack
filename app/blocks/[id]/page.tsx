@@ -25,6 +25,8 @@ export default async function BlockDetailPage({ params }: Props) {
     getBlockPhotos(Number(id)),
   ]);
 
+  console.log(block);
+
   if (!block) {
     return <div>Block not found</div>;
   }

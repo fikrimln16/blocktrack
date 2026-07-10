@@ -4,9 +4,7 @@ import { useRef } from "react";
 
 import dynamic from "next/dynamic";
 
-import L from "leaflet";
-
-import { Map, Maximize2, LocateFixed, Info } from "lucide-react";
+import { Map, Maximize2, LocateFixed, Info, MapPin } from "lucide-react";
 
 import { Block } from "@/types/block";
 
@@ -25,12 +23,14 @@ interface Props {
 }
 
 export function BlockDetailMap({ block }: Props) {
-  const mapRef = useRef<L.Map | null>(null);
+  const mapRef = useRef<any>(null);
 
   const mapWrapperRef = useRef<HTMLDivElement>(null);
 
-  const zoomToBlock = () => {
+  const zoomToBlock = async () => {
     if (!mapRef.current) return;
+
+    const L = await import("leaflet");
 
     const feature: Feature<Geometry> = {
       type: "Feature",
@@ -78,17 +78,22 @@ export function BlockDetailMap({ block }: Props) {
           </div>
 
           <p className="mt-1 text-sm text-slate-500">
-            Interactive plantation map with satellite imagery.
+            Interactive plantation map with visit history.
           </p>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <span className="rounded-xl bg-slate-100 px-3 py-2 text-sm font-medium">
             {Number(block.area_ha).toFixed(2)} Ha
           </span>
 
           <span className="rounded-xl bg-blue-50 px-3 py-2 text-sm font-medium text-blue-700">
             {block.status}
+          </span>
+
+          <span className="inline-flex items-center gap-2 rounded-xl bg-green-50 px-3 py-2 text-sm font-medium text-green-700">
+            <MapPin size={15} />
+            {block.visits?.length ?? 0} Visits
           </span>
         </div>
       </div>
@@ -113,13 +118,21 @@ export function BlockDetailMap({ block }: Props) {
           </button>
         </div>
 
-        <div className="flex items-center gap-2 text-sm text-slate-500">
-          <Info size={16} />
+        <div className="flex items-center gap-5 text-sm text-slate-500">
+          <div className="flex items-center gap-2">
+            <span className="h-3 w-3 rounded-full bg-green-600" />
+            <span>Latest Visit</span>
+          </div>
 
-          <span>
-            Gunakan menu <strong>Layers</strong> di kiri atas untuk mengganti
-            basemap.
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="h-3 w-3 rounded-full bg-red-500" />
+            <span>Previous Visit</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Info size={15} />
+            <span>Use Layers to change the basemap.</span>
+          </div>
         </div>
       </div>
 

@@ -80,9 +80,48 @@ export async function getBlockDetail(id: number) {
       ? JSON.parse(block.geometry)
       : block.geometry;
 
-  console.log(block);
+  // ===========================
+  // Ambil seluruh titik visit
+  // ===========================
+  const [visitRows] = await db.query(
+    `
+    SELECT
+      v.id,
+      v.visit_date,
+      v.visit_time,
+      v.latitude,
+      v.longitude,
+      v.weather,
 
-  return block;
+      u.id AS inspector_id,
+      u.name AS inspector
+
+    FROM visits v
+
+    INNER JOIN users u
+      ON u.id = v.user_id
+
+    WHERE v.block_id = ?
+      AND v.latitude IS NOT NULL
+      AND v.longitude IS NOT NULL
+
+    ORDER BY
+      v.visit_date ASC,
+      v.visit_time ASC
+    `,
+    [id],
+  );
+
+  const visits = (visitRows as any[]).map((visit) => ({
+    ...visit,
+    latitude: Number(visit.latitude),
+    longitude: Number(visit.longitude),
+  }));
+
+  return {
+    ...block,
+    visits,
+  };
 }
 
 export interface VisitPhoto {
