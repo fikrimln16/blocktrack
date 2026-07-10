@@ -8,6 +8,7 @@ import { VisitLocation } from "@/components/visit-detail/visit-location";
 import { VisitMap } from "@/components/visit-detail/visit-map";
 import { VisitDocumentation } from "@/components/visit-detail/documentation/visit-documentation";
 import { VisitAttachments } from "@/components/visit-detail/attachments/visit-attachments";
+import { VisitInspection } from "@/components/visit-detail/visit-inspection";
 
 import { findVisitDetail } from "@/services/visit-detail.service";
 import { VisitMapWrapper } from "@/components/visit-detail/visit-map-wrapper";
@@ -54,6 +55,8 @@ export default async function VisitDetailPage({ params }: Props) {
         </div>
 
         <div className="space-y-8">
+          <VisitInspection visit={visit} />
+
           <VisitDocumentation visit={visit} />
 
           <VisitAttachments visit={visit} />

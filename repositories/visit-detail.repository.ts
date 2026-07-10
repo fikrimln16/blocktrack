@@ -13,10 +13,48 @@ export async function getVisitDetail(id: number): Promise<VisitDetail> {
   const [rows] = await db.query<VisitRow[]>(
     `
     SELECT
-      v.*,
+      v.id,
+      v.visit_code,
+      v.visit_date,
+      v.visit_time,
+      v.duration,
+      v.weather,
+      v.latitude,
+      v.longitude,
+      v.accuracy,
+      v.notes,
+      COALESCE(v.status,'completed') AS status,
 
-      COALESCE(v.status, 'completed') AS status,
+      -- ======================
+      -- Inspection
+      -- ======================
+      v.plant_population,
+      v.plant_infill,
+      v.termite,
+      v.orcytes,
+      v.pest,
+      v.leaf_caterpillar,
+      v.beneficial_weed,
 
+      v.circle_condition,
+      v.harvesting_path,
+      v.interrow,
+      v.tph_condition,
+      v.sanitation,
+      v.cover_crop,
+
+      v.road_condition,
+      v.bridge_condition,
+      v.footbridge_condition,
+
+      v.drainage_condition,
+      v.ditch_condition,
+      v.monitoring_well,
+
+      v.fertilizing,
+
+      -- Inspector
+      u.id AS user_id,
       u.name AS inspector,
       u.role,
       u.photo,
@@ -29,12 +67,15 @@ export async function getVisitDetail(id: number): Promise<VisitDetail> {
         WHERE vv.user_id = u.id
       ) AS total_visits,
 
+      -- Block
       b.id AS block_id,
       b.block_name AS block,
       b.geometry AS polygon,
 
+      -- Estate
       e.name AS estate,
 
+      -- AMA
       a.name AS ama
 
     FROM visits v
@@ -58,8 +99,8 @@ export async function getVisitDetail(id: number): Promise<VisitDetail> {
     [id],
   );
 
-  if (!rows.length) {
-    throw new Error("Visit not found");
+  if (rows.length === 0) {
+    throw new Error("Visit not found.");
   }
 
   const visit = rows[0];
@@ -81,32 +122,28 @@ export async function getVisitDetail(id: number): Promise<VisitDetail> {
 
   const [attachmentRows] = await db.query<VisitAttachmentRow[]>(
     `
-    SELECT
-      id,
-      visit_id,
-      original_name,
-      file_name,
-      file_url,
-      file_type,
-      file_extension,
-      file_size,
-      category,
-      uploaded_by,
-      created_at
-    FROM visit_attachments
-    WHERE visit_id = ?
-    ORDER BY created_at DESC
-    `,
+      SELECT
+        id,
+        visit_id,
+        original_name,
+        file_name,
+        file_type,
+        file_extension,
+        file_size,
+        category,
+        uploaded_by,
+        created_at
+      FROM visit_attachments
+      WHERE visit_id = ?
+      ORDER BY created_at DESC
+      `,
     [id],
   );
 
   const photos: VisitPhoto[] = photoRows.map((photo) => ({
     id: photo.id,
     visit_id: photo.visit_id,
-
-    // photo_url di database hanya nama file
     photo_url: `/api/storage/uploads/photos/${photo.photo_url}`,
-
     category: photo.category,
     created_at: photo.created_at,
   }));
@@ -118,8 +155,7 @@ export async function getVisitDetail(id: number): Promise<VisitDetail> {
     original_name: attachment.original_name,
     file_name: attachment.file_name,
 
-    // file_url di database hanya nama file
-    file_url: `/api/storage/uploads/attachments/${attachment.file_url}`,
+    file_url: `/api/storage/uploads/attachments/${attachment.file_name}`,
 
     file_type: attachment.file_type,
     file_extension: attachment.file_extension,
@@ -129,18 +165,25 @@ export async function getVisitDetail(id: number): Promise<VisitDetail> {
     created_at: attachment.created_at,
   }));
 
+  let polygon = null;
+
+  try {
+    polygon =
+      typeof visit.polygon === "string"
+        ? JSON.parse(visit.polygon)
+        : visit.polygon;
+  } catch {
+    polygon = null;
+  }
+
   return {
     ...visit,
 
-    // Foto inspector
     photo: visit.photo
       ? `/api/storage/uploads/photos/${visit.photo}`
       : "/images/default-avatar.jpg",
 
-    polygon:
-      typeof visit.polygon === "string"
-        ? JSON.parse(visit.polygon)
-        : visit.polygon,
+    polygon,
 
     photos,
 

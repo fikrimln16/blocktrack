@@ -14,6 +14,7 @@ import { VisitPhotos } from "./sections/visit-photos";
 import { VisitNotes } from "./sections/visit-notes";
 import { VisitSummary } from "./sections/visit-summary";
 import { VisitInspector } from "./sections/visit-inspector";
+import { VisitInspection } from "./sections/visit-inspection";
 
 import { Block } from "@/types/block";
 import { VisitFormValues } from "@/types/visit-form";
@@ -89,6 +90,31 @@ export function VisitForm({ block, users }: Props) {
         latitude: Number(data.latitude),
         longitude: Number(data.longitude),
         accuracy: data.accuracy != null ? Number(data.accuracy) : null,
+
+        plant_population: data.plant_population ?? null,
+        plant_infill: data.plant_infill ?? null,
+        termite: data.termite ?? null,
+        orcytes: data.orcytes ?? null,
+        pest: data.pest ?? null,
+        leaf_caterpillar: data.leaf_caterpillar ?? null,
+        beneficial_weed: data.beneficial_weed ?? null,
+
+        circle_condition: data.circle_condition ?? null,
+        harvesting_path: data.harvesting_path ?? null,
+        interrow: data.interrow ?? null,
+        tph_condition: data.tph_condition ?? null,
+        sanitation: data.sanitation ?? null,
+        cover_crop: data.cover_crop ?? null,
+
+        road_condition: data.road_condition ?? null,
+        bridge_condition: data.bridge_condition ?? null,
+        footbridge_condition: data.footbridge_condition ?? null,
+
+        drainage_condition: data.drainage_condition ?? null,
+        ditch_condition: data.ditch_condition ?? null,
+        monitoring_well: data.monitoring_well ?? null,
+
+        fertilizing: data.fertilizing ?? null,
 
         notes: data.notes ?? "",
       };
@@ -196,6 +222,8 @@ export function VisitForm({ block, users }: Props) {
             />
 
             <VisitPhotos photos={photos} setPhotos={setPhotos} />
+
+            <VisitInspection register={register} watch={watch} />
 
             <VisitNotes register={register} watch={watch} errors={errors} />
           </div>

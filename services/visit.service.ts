@@ -80,6 +80,31 @@ interface VisitPayload {
   longitude: number;
   accuracy?: number;
 
+  plant_population?: number | null;
+  plant_infill?: number | null;
+  termite?: number | null;
+  orcytes?: number | null;
+  pest?: number | null;
+  leaf_caterpillar?: number | null;
+  beneficial_weed?: number | null;
+
+  circle_condition?: number | null;
+  harvesting_path?: number | null;
+  interrow?: number | null;
+  tph_condition?: number | null;
+  sanitation?: number | null;
+  cover_crop?: number | null;
+
+  road_condition?: number | null;
+  bridge_condition?: number | null;
+  footbridge_condition?: number | null;
+
+  drainage_condition?: number | null;
+  ditch_condition?: number | null;
+  monitoring_well?: number | null;
+
+  fertilizing?: number | null;
+
   notes: string;
 }
 
