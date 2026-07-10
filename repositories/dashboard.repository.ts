@@ -8,10 +8,31 @@ export async function getDashboardSummaryRepository(): Promise<DashboardSummary>
     `
     SELECT
       (SELECT COUNT(*) FROM visits) AS totalVisits,
+
       (SELECT COUNT(*) FROM amas) AS totalAma,
+
       (SELECT COUNT(*) FROM estates) AS totalEstates,
+
       (SELECT COUNT(*) FROM blocks) AS totalBlocks,
+
+      (
+        SELECT COUNT(DISTINCT block_id)
+        FROM visits
+      ) AS visitedBlocks,
+
+      (
+        SELECT COUNT(*)
+        FROM blocks
+        WHERE id NOT IN (
+          SELECT DISTINCT block_id
+          FROM visits
+        )
+      ) AS unvisitedBlocks,
+
       (SELECT COUNT(*) FROM visit_photos) AS totalPhotos,
+
+      (SELECT COUNT(*) FROM visit_attachments) AS totalAttachments,
+
       (SELECT COUNT(*) FROM users) AS totalUsers
     `,
   );

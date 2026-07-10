@@ -2,7 +2,7 @@ import { LucideIcon } from "lucide-react";
 
 interface Props {
   title: string;
-  value: number;
+  value?: number | null;
   subtitle?: string;
   color: string;
   icon: LucideIcon;
@@ -10,11 +10,13 @@ interface Props {
 
 export function SummaryCard({
   title,
-  value,
+  value = 0,
   subtitle,
   color,
   icon: Icon,
 }: Props) {
+  const displayValue = Number(value ?? 0);
+
   return (
     <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
       <div className="flex items-start justify-between">
@@ -22,7 +24,7 @@ export function SummaryCard({
           <p className="text-sm text-slate-500">{title}</p>
 
           <h2 className="mt-2 text-4xl font-bold text-slate-900">
-            {value.toLocaleString()}
+            {displayValue.toLocaleString("id-ID")}
           </h2>
 
           {subtitle && (

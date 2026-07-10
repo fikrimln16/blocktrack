@@ -1,9 +1,26 @@
 export interface DashboardSummary {
   totalVisits: number;
+
   totalAma: number;
+
   totalEstates: number;
+
   totalBlocks: number;
+
+  visitedBlocks: number;
+
+  unvisitedBlocks: number;
+
+  coveragePercentage: number;
+
+  todayVisits: number;
+
+  monthlyVisits: number;
+
   totalPhotos: number;
+
+  totalAttachments: number;
+
   totalUsers: number;
 }
 
