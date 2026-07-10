@@ -104,6 +104,13 @@ function FitBounds({ feature }: { feature: Feature<Geometry> }) {
   return null;
 }
 
+function formatDate(date: Date | string) {
+  return new Intl.DateTimeFormat("id-ID", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(new Date(date));
+}
 /* ===========================================
  * Component
  * =========================================== */
@@ -211,45 +218,123 @@ export function BlockDetailLeaflet({ block, mapRef }: Props) {
             position={[visit.latitude, visit.longitude]}
             icon={latest ? latestVisitIcon : visitIcon}
           >
-            <Popup>
-              <div className="min-w-[220px] space-y-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-semibold">Visit #{index + 1}</h3>
+            <Popup maxWidth={330}>
+              <div className="min-w-[290px]">
+                {/* Header */}
+                <div className="border-b pb-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold">Visit #{index + 1}</h3>
 
-                  {latest && (
-                    <span className="rounded-full bg-green-100 px-2 py-1 text-[10px] font-semibold text-green-700">
-                      Latest
-                    </span>
-                  )}
+                    {latest && (
+                      <span className="rounded-full bg-green-100 px-2 py-1 text-[10px] font-semibold text-green-700">
+                        Latest
+                      </span>
+                    )}
+                  </div>
+
+                  <p className="mt-1 text-xs text-slate-500">
+                    {formatDate(visit.visit_date)} • {visit.visit_time}
+                  </p>
                 </div>
 
-                <div className="space-y-1 text-sm">
-                  <div>
-                    <span className="font-medium">Inspector:</span>{" "}
-                    {visit.inspector}
+                {/* Inspector */}
+                <div className="mt-4 space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Inspector</span>
+                    <span className="font-medium">{visit.inspector}</span>
                   </div>
 
-                  <div>
-                    <span className="font-medium">Date:</span>{" "}
-                    {visit.visit_date}
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Weather</span>
+                    <span>{visit.weather}</span>
                   </div>
 
-                  <div>
-                    <span className="font-medium">Time:</span>{" "}
-                    {visit.visit_time}
-                  </div>
-
-                  <div>
-                    <span className="font-medium">Weather:</span>{" "}
-                    {visit.weather}
-                  </div>
-
-                  <div>
-                    <span className="font-medium">Coordinate:</span>
-                    <br />
-                    {visit.latitude.toFixed(6)}, {visit.longitude.toFixed(6)}
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Duration</span>
+                    <span>{visit.duration} min</span>
                   </div>
                 </div>
+
+                {/* Overall */}
+                <div className="mt-5 rounded-xl bg-blue-50 p-4 text-center">
+                  <p className="text-xs uppercase text-slate-500">
+                    Overall Score
+                  </p>
+
+                  <div className="mt-1 text-3xl font-bold text-blue-600">
+                    {Math.round(visit.overall_score)}%
+                  </div>
+                </div>
+
+                {/* Summary */}
+                <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    🌴 Plant
+                    <div className="font-semibold">
+                      {Math.round(visit.plant_score)}%
+                    </div>
+                  </div>
+
+                  <div>
+                    🌱 Field
+                    <div className="font-semibold">
+                      {Math.round(visit.field_score)}%
+                    </div>
+                  </div>
+
+                  <div>
+                    🛣 Infrastructure
+                    <div className="font-semibold">
+                      {Math.round(visit.infrastructure_score)}%
+                    </div>
+                  </div>
+
+                  <div>
+                    🌧 Environment
+                    <div className="font-semibold">
+                      {Math.round(visit.environment_score)}%
+                    </div>
+                  </div>
+
+                  <div>
+                    👷 Management
+                    <div className="font-semibold">
+                      {Math.round(visit.management_score)}%
+                    </div>
+                  </div>
+                </div>
+
+                {/* Documentation */}
+                <div className="mt-5 flex justify-between rounded-xl bg-slate-50 px-4 py-3 text-sm">
+                  <span>📷 {visit.total_photos} Photos</span>
+
+                  <span>📎 {visit.total_attachments} Files</span>
+                </div>
+
+                {/* Notes */}
+                {visit.notes && (
+                  <div className="mt-4 rounded-xl border border-slate-200 p-3">
+                    <p className="mb-1 text-xs font-semibold uppercase text-slate-500">
+                      Notes
+                    </p>
+
+                    <p className="line-clamp-3 text-sm text-slate-700">
+                      {visit.notes}
+                    </p>
+                  </div>
+                )}
+
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    window.open(`/visits/${visit.id}`, "_blank");
+                  }}
+                  className="mt-5 w-full rounded-xl bg-blue-600 py-2.5 text-sm font-medium text-white hover:bg-blue-700"
+                >
+                  View Visit Detail
+                </button>
               </div>
             </Popup>
           </Marker>

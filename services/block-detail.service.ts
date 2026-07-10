@@ -86,28 +86,103 @@ export async function getBlockDetail(id: number) {
   const [visitRows] = await db.query(
     `
     SELECT
-      v.id,
-      v.visit_date,
-      v.visit_time,
-      v.latitude,
-      v.longitude,
-      v.weather,
+    v.id,
+    v.visit_date,
+    v.visit_time,
+    v.duration,
+    v.weather,
+    v.latitude,
+    v.longitude,
+    v.notes,
 
-      u.id AS inspector_id,
-      u.name AS inspector
+    u.name AS inspector,
 
-    FROM visits v
+    (
+        COALESCE(v.plant_population,0) +
+        COALESCE(v.plant_infill,0) +
+        COALESCE(v.termite,0) +
+        COALESCE(v.orcytes,0) +
+        COALESCE(v.pest,0) +
+        COALESCE(v.leaf_caterpillar,0) +
+        COALESCE(v.beneficial_weed,0)
+    ) / 7 AS plant_score,
 
-    INNER JOIN users u
-      ON u.id = v.user_id
+    (
+        COALESCE(v.circle_condition,0) +
+        COALESCE(v.harvesting_path,0) +
+        COALESCE(v.interrow,0) +
+        COALESCE(v.tph_condition,0) +
+        COALESCE(v.sanitation,0) +
+        COALESCE(v.cover_crop,0)
+    ) / 6 AS field_score,
 
-    WHERE v.block_id = ?
-      AND v.latitude IS NOT NULL
-      AND v.longitude IS NOT NULL
+    (
+        COALESCE(v.road_condition,0) +
+        COALESCE(v.bridge_condition,0) +
+        COALESCE(v.footbridge_condition,0)
+    ) / 3 AS infrastructure_score,
 
-    ORDER BY
-      v.visit_date ASC,
-      v.visit_time ASC
+    (
+        COALESCE(v.drainage_condition,0) +
+        COALESCE(v.ditch_condition,0) +
+        COALESCE(v.monitoring_well,0)
+    ) / 3 AS environment_score,
+
+    COALESCE(v.fertilizing,0) AS management_score,
+
+    (
+        (
+            COALESCE(v.plant_population,0) +
+            COALESCE(v.plant_infill,0) +
+            COALESCE(v.termite,0) +
+            COALESCE(v.orcytes,0) +
+            COALESCE(v.pest,0) +
+            COALESCE(v.leaf_caterpillar,0) +
+            COALESCE(v.beneficial_weed,0) +
+
+            COALESCE(v.circle_condition,0) +
+            COALESCE(v.harvesting_path,0) +
+            COALESCE(v.interrow,0) +
+            COALESCE(v.tph_condition,0) +
+            COALESCE(v.sanitation,0) +
+            COALESCE(v.cover_crop,0) +
+
+            COALESCE(v.road_condition,0) +
+            COALESCE(v.bridge_condition,0) +
+            COALESCE(v.footbridge_condition,0) +
+
+            COALESCE(v.drainage_condition,0) +
+            COALESCE(v.ditch_condition,0) +
+            COALESCE(v.monitoring_well,0) +
+
+            COALESCE(v.fertilizing,0)
+        ) / 20
+    ) AS overall_score,
+
+    (
+        SELECT COUNT(*)
+        FROM visit_photos vp
+        WHERE vp.visit_id = v.id
+    ) AS total_photos,
+
+    (
+        SELECT COUNT(*)
+        FROM visit_attachments va
+        WHERE va.visit_id = v.id
+    ) AS total_attachments
+
+FROM visits v
+
+INNER JOIN users u
+    ON u.id = v.user_id
+
+WHERE v.block_id = ?
+AND v.latitude IS NOT NULL
+AND v.longitude IS NOT NULL
+
+ORDER BY
+    v.visit_date ASC,
+    v.visit_time ASC;
     `,
     [id],
   );

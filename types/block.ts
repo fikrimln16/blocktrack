@@ -7,14 +7,27 @@ export interface BlockVisit {
   inspector: string;
 
   visit_date: string;
-
   visit_time: string;
 
-  latitude: number;
-
-  longitude: number;
+  duration: number;
 
   weather: string;
+
+  latitude: number;
+  longitude: number;
+
+  notes: string;
+
+  plant_score: number;
+  field_score: number;
+  infrastructure_score: number;
+  environment_score: number;
+  management_score: number;
+
+  overall_score: number;
+
+  total_photos: number;
+  total_attachments: number;
 }
 
 export interface Block extends RowDataPacket {
