@@ -11,6 +11,7 @@ import {
   ImageIcon,
   MapPinned,
   UserRound,
+  Paperclip,
 } from "lucide-react";
 
 import { VisitListItem } from "@/types/visit-list";
@@ -192,11 +193,15 @@ export function VisitTable({ visits, loading = false }: Props) {
                 </td>
                 {/* Attachments */}
                 <td className="px-4 py-5 text-center">
-                  <span className="inline-flex items-center gap-2 rounded-full bg-amber-50 px-3 py-2 text-sm font-medium text-amber-700">
-                    <ImageIcon size={15} />
+                  <div className="inline-flex items-center gap-2">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-amber-700">
+                      <Paperclip size={16} />
+                    </div>
 
-                    {visit.total_attachments}
-                  </span>
+                    <span className="font-semibold text-slate-700">
+                      {visit.total_attachments}
+                    </span>
+                  </div>
                 </td>
                 {/* Action */}
                 <td className="sticky right-0 bg-white px-6 py-5 text-right">

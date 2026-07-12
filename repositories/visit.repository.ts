@@ -47,10 +47,47 @@ export interface CreateVisitPayload {
   notes: string;
 }
 
+interface AmaRow extends RowDataPacket {
+  ama_code: string;
+}
+
 export async function createVisit(
   connection: PoolConnection,
   visit: CreateVisitPayload,
 ): Promise<number> {
+  // ===========================
+  // Ambil kode AMA
+  // ===========================
+
+  const [amaRows] = await connection.query<AmaRow[]>(
+    `
+    SELECT
+      a.code AS ama_code
+    FROM blocks b
+
+    INNER JOIN estates e
+      ON e.id = b.estate_id
+
+    INNER JOIN amas a
+      ON a.id = e.ama_id
+
+    WHERE b.id = ?
+
+    LIMIT 1
+    `,
+    [visit.block_id],
+  );
+
+  if (amaRows.length === 0) {
+    throw new Error("AMA not found.");
+  }
+
+  const amaCode = amaRows[0].ama_code.toUpperCase();
+
+  // ===========================
+  // Insert Visit
+  // ===========================
+
   const [result] = await connection.execute<ResultSetHeader>(
     `
     INSERT INTO visits
@@ -105,7 +142,7 @@ export async function createVisit(
 
       ?, ?, ?,
 
-      ?, ?, ?,
+      ?, ?, ? ,
 
       ?,
 
@@ -126,7 +163,7 @@ export async function createVisit(
       visit.longitude,
       visit.accuracy ?? null,
 
-      // Plant Condition
+      // Plant
       visit.plant_population ?? null,
       visit.plant_infill ?? null,
       visit.termite ?? null,
@@ -135,7 +172,7 @@ export async function createVisit(
       visit.leaf_caterpillar ?? null,
       visit.beneficial_weed ?? null,
 
-      // Field Condition
+      // Field
       visit.circle_condition ?? null,
       visit.harvesting_path ?? null,
       visit.interrow ?? null,
@@ -160,7 +197,40 @@ export async function createVisit(
     ],
   );
 
-  return result.insertId;
+  const visitId = result.insertId;
+
+  // ===========================
+  // Generate Visit Code
+  // ===========================
+
+  const date = new Date(visit.visit_date);
+
+  const yy = String(date.getFullYear()).slice(-2);
+
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+
+  const dd = String(date.getDate()).padStart(2, "0");
+
+  const dateCode = `${yy}${mm}${dd}`;
+
+  const uniqueId = String(visitId).padStart(2, "0");
+
+  const visitCode = `VIS-${dateCode}-${amaCode}-${uniqueId}`;
+
+  // ===========================
+  // Update Visit Code
+  // ===========================
+
+  await connection.execute(
+    `
+    UPDATE visits
+    SET visit_code = ?
+    WHERE id = ?
+    `,
+    [visitCode, visitId],
+  );
+
+  return visitId;
 }
 
 export async function createVisitPhoto(
