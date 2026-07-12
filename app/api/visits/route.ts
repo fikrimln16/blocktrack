@@ -94,3 +94,41 @@ export async function POST(req: Request) {
     );
   }
 }
+
+import { NextRequest } from "next/server";
+
+import { getVisitList } from "@/services/visit-list.service";
+
+export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
+
+  const result = await getVisitList({
+    page: Number(searchParams.get("page") ?? 1),
+
+    limit: Number(searchParams.get("limit") ?? 20),
+
+    search: searchParams.get("search") ?? "",
+
+    ama: Number(searchParams.get("ama")) || undefined,
+
+    estate: Number(searchParams.get("estate")) || undefined,
+
+    block: Number(searchParams.get("block")) || undefined,
+
+    inspector: Number(searchParams.get("inspector")) || undefined,
+
+    weather: searchParams.get("weather") ?? undefined,
+
+    status: searchParams.get("status") ?? undefined,
+
+    startDate: searchParams.get("startDate") ?? undefined,
+
+    endDate: searchParams.get("endDate") ?? undefined,
+
+    sortBy: searchParams.get("sortBy") ?? "visit_date",
+
+    sortOrder: (searchParams.get("sortOrder") as "ASC" | "DESC") ?? "DESC",
+  });
+
+  return NextResponse.json(result);
+}
