@@ -6,7 +6,13 @@ export interface VisitListItem {
   visit_date: string;
   visit_time: string;
 
+  weather: string;
+  duration: number;
+
+  status: string;
+
   inspector: string;
+  inspector_photo: string | null;
 
   ama: string;
   estate: string;
@@ -14,14 +20,8 @@ export interface VisitListItem {
   block_code: string;
   block_name: string;
 
-  weather: string;
-
-  duration: number;
-
   total_photos: number;
   total_attachments: number;
-
-  status: string;
 }
 
 export interface VisitListResponse {

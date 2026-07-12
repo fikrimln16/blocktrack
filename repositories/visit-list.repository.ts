@@ -161,6 +161,7 @@ export async function getVisitListRepository(
       v.status,
 
       u.name AS inspector,
+      u.photo AS inspector_photo,
 
       a.name AS ama,
 
@@ -209,8 +210,16 @@ export async function getVisitListRepository(
     [...params, limit, offset],
   );
 
+  const data = rows.map((row) => ({
+    ...row,
+
+    inspector_photo: row.inspector_photo
+      ? `/api/storage/uploads/users/${row.inspector_photo}`
+      : null,
+  }));
+
   return {
-    data: rows,
+    data,
 
     total: Number(count.total),
 

@@ -31,11 +31,11 @@ const menus = [
   //   href: "/monitoring",
   //   icon: Map,
   // },
-  // {
-  //   title: "Visit History",
-  //   href: "/visits",
-  //   icon: History,
-  // },
+  {
+    title: "Visit History",
+    href: "/visits",
+    icon: History,
+  },
   // {
   //   title: "AMA",
   //   href: "/amas",

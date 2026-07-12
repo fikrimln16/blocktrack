@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 import {
   CalendarDays,
@@ -129,11 +130,23 @@ export function VisitTable({ visits, loading = false }: Props) {
                 {/* Inspector */}
                 <td className="px-4 py-5">
                   <div className="flex items-center gap-3">
-                    <div className="rounded-full bg-emerald-100 p-2">
-                      <UserRound size={16} className="text-emerald-600" />
-                    </div>
+                    <Image
+                      src={
+                        visit.inspector_photo ?? "/images/default-avatar.jpg"
+                      }
+                      alt={visit.inspector}
+                      width={42}
+                      height={42}
+                      className="rounded-full border border-slate-200 object-cover"
+                    />
 
-                    <span className="font-medium">{visit.inspector}</span>
+                    <div>
+                      <p className="font-medium text-slate-900">
+                        {visit.inspector}
+                      </p>
+
+                      <p className="text-xs text-slate-500">Inspector</p>
+                    </div>
                   </div>
                 </td>
 
