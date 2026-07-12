@@ -214,7 +214,7 @@ export async function getVisitListRepository(
     ...row,
 
     inspector_photo: row.inspector_photo
-      ? `/api/storage/uploads/users/${row.inspector_photo}`
+      ? `/api/storage/uploads/photos/${row.inspector_photo}`
       : null,
   }));
 
