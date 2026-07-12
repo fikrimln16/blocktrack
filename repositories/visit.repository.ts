@@ -100,6 +100,7 @@ export async function createVisit(
 
       weather,
       duration,
+      status,
 
       latitude,
       longitude,
@@ -134,7 +135,9 @@ export async function createVisit(
     )
     VALUES
     (
-      ?, ?, ?, ?, ?, ?, ?, ?, ?,
+      ?, ?, ?, ?, ?, ?, ?,
+
+      ?, ?, ?,
 
       ?, ?, ?, ?, ?, ?, ?,
 
@@ -158,6 +161,8 @@ export async function createVisit(
 
       visit.weather,
       visit.duration,
+
+      "Done", // Status otomatis
 
       visit.latitude,
       visit.longitude,

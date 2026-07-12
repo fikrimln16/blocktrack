@@ -53,6 +53,9 @@ export async function getVisitDetail(id: number): Promise<VisitDetail> {
 
       v.fertilizing,
 
+      v.created_at,
+      v.updated_at,
+
       -- Inspector
       u.id AS user_id,
       u.name AS inspector,

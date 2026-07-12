@@ -76,6 +76,18 @@ function getHealth(score?: number) {
   };
 }
 
+function formatDateTime(date: Date | string | null) {
+  if (!date) return "-";
+
+  return new Intl.DateTimeFormat("id-ID", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(date));
+}
+
 export function OperationalSummary({ block }: Props) {
   const treeAge =
     block.planting_year && Number(block.planting_year) > 0
@@ -125,7 +137,7 @@ export function OperationalSummary({ block }: Props) {
     {
       icon: Clock3,
       title: "Last Updated",
-      value: block.updated_at ?? "-",
+      value: formatDateTime(block.last_updated_at),
     },
   ];
 

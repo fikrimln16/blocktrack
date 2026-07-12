@@ -19,12 +19,25 @@ export function BlockPhotoGallery({ photos }: Props) {
   return (
     <>
       <div>
-        <div className="mb-3 flex items-center gap-2">
-          <Camera size={16} className="text-slate-500" />
+        <div className="mb-3 flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Camera size={16} className="text-slate-500" />
 
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-            Documentation ({photos.length})
-          </p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+              Documentation ({photos.length})
+            </p>
+          </div>
+
+          <button
+            onClick={() => setSelected(0)}
+            className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
+          >
+            <Camera size={14} />
+            View All Photos
+            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600">
+              {photos.length}
+            </span>
+          </button>
         </div>
 
         <div className="grid grid-cols-4 gap-3 lg:grid-cols-6 xl:grid-cols-8">

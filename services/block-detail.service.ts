@@ -44,6 +44,14 @@ export async function getBlockDetail(id: number) {
     ) AS last_visit_time,
 
     (
+      SELECT vv.updated_at
+      FROM visits vv
+      WHERE vv.block_id = b.id
+      ORDER BY vv.visit_date DESC, vv.visit_time DESC
+      LIMIT 1
+    ) AS last_updated_at,
+
+    (
       SELECT u.name
       FROM visits vv
       INNER JOIN users u
@@ -161,6 +169,7 @@ export async function getBlockDetail(id: number) {
     v.id,
     v.visit_date,
     v.visit_time,
+    v.updated_at,
     v.duration,
     v.weather,
     v.latitude,
@@ -264,6 +273,8 @@ ORDER BY
     latitude: Number(visit.latitude),
     longitude: Number(visit.longitude),
   }));
+
+  console.log(block);
 
   return {
     ...block,
