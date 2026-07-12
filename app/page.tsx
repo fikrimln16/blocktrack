@@ -25,13 +25,6 @@ export default function LandingPage() {
 
           <div className="flex items-center gap-3">
             <Link
-              href="/login"
-              className="rounded-xl border border-slate-200 px-5 py-2.5 font-medium transition hover:bg-slate-100"
-            >
-              Login
-            </Link>
-
-            <Link
               href="/dashboard"
               className="rounded-xl bg-blue-600 px-5 py-2.5 font-medium text-white transition hover:bg-blue-700"
             >
@@ -68,13 +61,6 @@ export default function LandingPage() {
               >
                 Open Dashboard
                 <ArrowRight size={18} />
-              </Link>
-
-              <Link
-                href="/login"
-                className="rounded-2xl border border-slate-300 bg-white px-6 py-4 font-semibold text-slate-700 transition hover:bg-slate-100"
-              >
-                Sign In
               </Link>
             </div>
           </div>

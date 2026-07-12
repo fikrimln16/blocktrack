@@ -181,3 +181,86 @@ export async function createVisitPhoto(
     [visitId, photoUrl],
   );
 }
+
+import fs from "fs/promises";
+import path from "path";
+
+import { RowDataPacket } from "mysql2/promise";
+
+interface VisitPhotoRow extends RowDataPacket {
+  photo_url: string;
+}
+
+interface VisitAttachmentRow extends RowDataPacket {
+  file_url: string;
+}
+
+export async function deleteVisit(
+  connection: PoolConnection,
+  visitId: number,
+): Promise<void> {
+  const [photos] = await connection.execute<VisitPhotoRow[]>(
+    `
+    SELECT
+      photo_url
+    FROM visit_photos
+    WHERE visit_id = ?
+    `,
+    [visitId],
+  );
+
+  const [attachments] = await connection.execute<VisitAttachmentRow[]>(
+    `
+    SELECT
+      file_url
+    FROM visit_attachments
+    WHERE visit_id = ?
+    `,
+    [visitId],
+  );
+
+  await connection.execute(
+    `
+    DELETE FROM visit_photos
+    WHERE visit_id = ?
+    `,
+    [visitId],
+  );
+
+  await connection.execute(
+    `
+    DELETE FROM visit_attachments
+    WHERE visit_id = ?
+    `,
+    [visitId],
+  );
+
+  await connection.execute(
+    `
+    DELETE FROM visits
+    WHERE id = ?
+    `,
+    [visitId],
+  );
+
+  // Hapus file fisik (dipanggil setelah data database dihapus)
+  await Promise.allSettled(
+    photos.map((photo) =>
+      fs.unlink(
+        path.join(process.cwd(), "storage/uploads/photos", photo.photo_url),
+      ),
+    ),
+  );
+
+  await Promise.allSettled(
+    attachments.map((attachment) =>
+      fs.unlink(
+        path.join(
+          process.cwd(),
+          "storage/uploads/attachments",
+          attachment.file_url,
+        ),
+      ),
+    ),
+  );
+}

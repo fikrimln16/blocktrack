@@ -236,3 +236,22 @@ export async function getVisitPhotos(visitId: number): Promise<VisitPhoto[]> {
 
   return rows as VisitPhoto[];
 }
+
+import { deleteVisit } from "@/repositories/visit.repository";
+
+export async function deleteVisitService(visitId: number): Promise<void> {
+  const connection = await db.getConnection();
+
+  try {
+    await connection.beginTransaction();
+
+    await deleteVisit(connection, visitId);
+
+    await connection.commit();
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
+}

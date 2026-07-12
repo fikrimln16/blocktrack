@@ -114,46 +114,26 @@ export function BlockHeader({ block }: Props) {
             {/* ACTION */}
 
             <div className="flex flex-wrap items-start gap-3">
-              <button
+              <Link
+                href={`/dashboard/visits/new?block=${block.id}`}
                 className="
+                  group
                   inline-flex
                   items-center
                   gap-2
                   rounded-xl
-                  border
-                  border-slate-200
-                  bg-white
+                  bg-green-600
                   px-5
                   py-3
                   font-medium
-                  transition
-                  hover:bg-slate-50
+                  text-white
+                  shadow-sm
+                  transition-all
+                  duration-200
+                  hover:bg-green-700
+                  hover:shadow-lg
+                  active:scale-[0.98]
                 "
-              >
-                <Pencil size={18} />
-                Edit
-              </button>
-
-              <Link
-                href={`/dashboard/visits/new?block=${block.id}`}
-                className="
-    group
-    inline-flex
-    items-center
-    gap-2
-    rounded-xl
-    bg-green-600
-    px-5
-    py-3
-    font-medium
-    text-white
-    shadow-sm
-    transition-all
-    duration-200
-    hover:bg-green-700
-    hover:shadow-lg
-    active:scale-[0.98]
-  "
               >
                 <ClipboardPlus size={18} />
 
@@ -164,45 +144,6 @@ export function BlockHeader({ block }: Props) {
                   className="transition-transform group-hover:translate-x-1"
                 />
               </Link>
-
-              <button
-                className="
-                  inline-flex
-                  items-center
-                  gap-2
-                  rounded-xl
-                  bg-blue-600
-                  px-5
-                  py-3
-                  font-medium
-                  text-white
-                  transition
-                  hover:bg-blue-700
-                "
-              >
-                <Download size={18} />
-                Export
-              </button>
-
-              <button
-                className="
-                  inline-flex
-                  items-center
-                  gap-2
-                  rounded-xl
-                  border
-                  border-slate-200
-                  bg-white
-                  px-5
-                  py-3
-                  font-medium
-                  transition
-                  hover:bg-slate-50
-                "
-              >
-                <MapPinned size={18} />
-                Open Map
-              </button>
             </div>
           </div>
         </div>

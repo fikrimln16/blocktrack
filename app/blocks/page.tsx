@@ -152,25 +152,6 @@ export default function BlocksPage() {
               Monitor all plantation blocks and their visit history.
             </p>
           </div>
-
-          <button
-            className="
-            inline-flex
-            items-center
-            gap-2
-            rounded-2xl
-            bg-blue-600
-            px-5
-            py-3
-            font-medium
-            text-white
-            transition
-            hover:bg-blue-700
-          "
-          >
-            <Download size={18} />
-            Export
-          </button>
         </div>
 
         {/* Summary */}
