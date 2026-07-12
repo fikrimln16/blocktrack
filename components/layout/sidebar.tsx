@@ -51,11 +51,11 @@ const menus = [
     href: "/blocks",
     icon: Package,
   },
-  // {
-  //   title: "Photos",
-  //   href: "/photos",
-  //   icon: ImageIcon,
-  // },
+  {
+    title: "Gallery",
+    href: "/gallery",
+    icon: ImageIcon,
+  },
   // {
   //   title: "Reports",
   //   href: "/reports",

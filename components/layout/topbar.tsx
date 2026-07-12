@@ -61,10 +61,10 @@ function getPageInfo(pathname: string) {
     };
   }
 
-  if (pathname === "/amas") {
+  if (pathname === "/gallery") {
     return {
-      title: "AMA Management",
-      description: "Manage all AMA locations",
+      title: "Gallery",
+      description: "Documentation all photos",
     };
   }
 
