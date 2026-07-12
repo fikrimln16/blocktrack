@@ -11,6 +11,7 @@ import { Visit } from "@/types/visit";
 import { VisitEmpty } from "./visit-empty";
 import { VisitHistoryItem } from "./visit-history-item";
 import { VisitPhoto } from "@/services/block-detail.service";
+import { BlockPhotoGallery } from "./block-photo-gallery";
 
 interface Props {
   visits: Visit[];
@@ -88,32 +89,7 @@ export function VisitHistory({ visits, photos }: Props) {
             )}
 
             {/* Gallery */}
-            {photos.length > 0 && (
-              <div>
-                <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
-                  Documentation
-                </p>
-
-                <div className="flex flex-wrap gap-3">
-                  {photos.slice(0, 8).map((photo) => (
-                    <Image
-                      key={photo.id}
-                      src={photo.photo_url}
-                      alt="Documentation"
-                      width={90}
-                      height={90}
-                      className="h-20 w-20 rounded-xl border border-slate-200 object-cover transition hover:scale-105"
-                    />
-                  ))}
-
-                  {photos.length > 8 && (
-                    <div className="flex h-20 w-20 items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-100 text-sm font-semibold text-slate-600">
-                      +{photos.length - 8}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
+            {photos.length > 0 && <BlockPhotoGallery photos={photos} />}
           </div>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">

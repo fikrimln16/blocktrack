@@ -3,69 +3,141 @@ import db from "@/lib/db";
 export async function getBlockDetail(id: number) {
   const [rows] = await db.query(
     `
-    SELECT
-      b.id,
-      b.block_code,
-      b.block_name,
-      b.status,
-      b.division,
-      b.area_ha,
-      b.planting_year,
-      b.ba_code,
-      b.ba_initial,
-      b.unit,
-      b.remarks,
-      b.geometry,
+  SELECT
+    b.id,
+    b.block_code,
+    b.block_name,
+    b.status,
+    b.division,
+    b.area_ha,
+    b.planting_year,
+    b.ba_code,
+    b.ba_initial,
+    b.unit,
+    b.remarks,
+    b.geometry,
 
-      e.id AS estate_id,
-      e.name AS estate,
+    e.id AS estate_id,
+    e.name AS estate,
 
-      a.id AS ama_id,
-      a.name AS ama,
+    a.id AS ama_id,
+    a.name AS ama,
 
-      COUNT(DISTINCT v.id) AS total_visit,
-      COUNT(DISTINCT vp.id) AS total_photos,
-      COUNT(DISTINCT va.id) AS total_attachments
+    COUNT(DISTINCT v.id) AS total_visit,
+    COUNT(DISTINCT vp.id) AS total_photos,
+    COUNT(DISTINCT va.id) AS total_attachments,
 
-    FROM blocks b
+    (
+      SELECT vv.visit_date
+      FROM visits vv
+      WHERE vv.block_id = b.id
+      ORDER BY vv.visit_date DESC, vv.visit_time DESC
+      LIMIT 1
+    ) AS last_visit_date,
 
-    INNER JOIN estates e
-      ON e.id = b.estate_id
+    (
+      SELECT vv.visit_time
+      FROM visits vv
+      WHERE vv.block_id = b.id
+      ORDER BY vv.visit_date DESC, vv.visit_time DESC
+      LIMIT 1
+    ) AS last_visit_time,
 
-    INNER JOIN amas a
-      ON a.id = e.ama_id
+    (
+      SELECT u.name
+      FROM visits vv
+      INNER JOIN users u
+        ON u.id = vv.user_id
+      WHERE vv.block_id = b.id
+      ORDER BY vv.visit_date DESC, vv.visit_time DESC
+      LIMIT 1
+    ) AS last_inspector,
 
-    LEFT JOIN visits v
-      ON v.block_id = b.id
+    (
+      SELECT vv.weather
+      FROM visits vv
+      WHERE vv.block_id = b.id
+      ORDER BY vv.visit_date DESC, vv.visit_time DESC
+      LIMIT 1
+    ) AS last_weather,
 
-    LEFT JOIN visit_photos vp
-      ON vp.visit_id = v.id
+     (
+      SELECT ROUND(AVG(vv.duration), 0)
+      FROM visits vv
+      WHERE vv.block_id = b.id
+    ) AS average_duration,
 
-    LEFT JOIN visit_attachments va
-      ON va.visit_id = v.id
+    (
+      SELECT ROUND(
+        AVG(
+          (
+            COALESCE(vv.plant_population,0) +
+            COALESCE(vv.plant_infill,0) +
+            COALESCE(vv.termite,0) +
+            COALESCE(vv.orcytes,0) +
+            COALESCE(vv.pest,0) +
+            COALESCE(vv.leaf_caterpillar,0) +
+            COALESCE(vv.beneficial_weed,0) +
+            COALESCE(vv.circle_condition,0) +
+            COALESCE(vv.harvesting_path,0) +
+            COALESCE(vv.interrow,0) +
+            COALESCE(vv.tph_condition,0) +
+            COALESCE(vv.sanitation,0) +
+            COALESCE(vv.cover_crop,0) +
+            COALESCE(vv.road_condition,0) +
+            COALESCE(vv.bridge_condition,0) +
+            COALESCE(vv.footbridge_condition,0) +
+            COALESCE(vv.drainage_condition,0) +
+            COALESCE(vv.ditch_condition,0) +
+            COALESCE(vv.monitoring_well,0) +
+            COALESCE(vv.fertilizing,0)
+          ) / 20
+        ),
+        1
+      )
+      FROM visits vv
+      WHERE vv.block_id = b.id
+    ) AS average_score
 
-    WHERE b.id = ?
+  FROM blocks b
 
-    GROUP BY
-      b.id,
-      b.block_code,
-      b.block_name,
-      b.status,
-      b.division,
-      b.area_ha,
-      b.planting_year,
-      b.ba_code,
-      b.ba_initial,
-      b.unit,
-      b.remarks,
-      b.geometry,
-      e.id,
-      e.name,
-      a.id,
-      a.name
+  INNER JOIN estates e
+    ON e.id = b.estate_id
 
-    LIMIT 1
-    `,
+  INNER JOIN amas a
+    ON a.id = e.ama_id
+
+  LEFT JOIN visits v
+    ON v.block_id = b.id
+
+  LEFT JOIN visit_photos vp
+    ON vp.visit_id = v.id
+
+  LEFT JOIN visit_attachments va
+    ON va.visit_id = v.id
+
+  WHERE b.id = ?
+
+  GROUP BY
+    b.id,
+    b.block_code,
+    b.block_name,
+    b.status,
+    b.division,
+    b.area_ha,
+    b.planting_year,
+    b.ba_code,
+    b.ba_initial,
+    b.unit,
+    b.remarks,
+    b.geometry,
+    e.id,
+    e.name,
+    a.id,
+    a.name
+
+  LIMIT 1
+  `,
     [id],
   );
 
@@ -202,28 +274,101 @@ ORDER BY
 export interface VisitPhoto {
   id: number;
   visit_id: number;
+
   photo_url: string;
+
+  visit_code: string;
+  visit_date: string;
+  visit_time: string;
+
+  inspector: string;
+  weather: string;
+
+  block_code: string;
+  block_name: string;
+  estate: string;
+}
+
+import { RowDataPacket } from "mysql2";
+
+interface VisitPhotoRow extends RowDataPacket {
+  id: number;
+  visit_id: number;
+
+  photo_url: string;
+
+  visit_code: string;
+  visit_date: string;
+  visit_time: string;
+
+  inspector: string;
+  weather: string;
+
+  block_code: string;
+  block_name: string;
+
+  estate: string;
 }
 
 export async function getBlockPhotos(blockId: number): Promise<VisitPhoto[]> {
-  const [rows] = await db.query(
+  const [rows] = await db.query<VisitPhotoRow[]>(
     `
     SELECT
       vp.id,
       vp.visit_id,
-      vp.photo_url
+      vp.photo_url,
+
+      v.visit_code,
+      DATE_FORMAT(v.visit_date, '%d %b %Y') AS visit_date,
+      TIME_FORMAT(v.visit_time, '%H:%i') AS visit_time,
+      v.weather,
+
+      u.name AS inspector,
+
+      b.block_code,
+      b.block_name,
+
+      e.name AS estate
+
     FROM visit_photos vp
+
     INNER JOIN visits v
       ON v.id = vp.visit_id
+
+    INNER JOIN users u
+      ON u.id = v.user_id
+
+    INNER JOIN blocks b
+      ON b.id = v.block_id
+
+    INNER JOIN estates e
+      ON e.id = b.estate_id
+
     WHERE v.block_id = ?
-    ORDER BY vp.id ASC
+
+    ORDER BY
+      v.visit_date DESC,
+      v.visit_time DESC,
+      vp.id ASC
     `,
     [blockId],
   );
 
-  return (rows as any[]).map((row) => ({
+  return rows.map((row) => ({
     id: row.id,
     visit_id: row.visit_id,
+
     photo_url: `/api/storage/uploads/photos/${row.photo_url}`,
+
+    visit_code: row.visit_code,
+    visit_date: row.visit_date,
+    visit_time: row.visit_time,
+
+    inspector: row.inspector,
+    weather: row.weather,
+
+    block_code: row.block_code,
+    block_name: row.block_name,
+    estate: row.estate,
   }));
 }
