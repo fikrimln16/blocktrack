@@ -109,7 +109,6 @@ export function VisitTable({ visits, loading = false }: Props) {
                     </div>
                   </div>
                 </td>
-
                 {/* Date */}
                 <td className="px-4 py-5">
                   <div className="flex items-center gap-3">
@@ -126,30 +125,32 @@ export function VisitTable({ visits, loading = false }: Props) {
                     </div>
                   </div>
                 </td>
-
                 {/* Inspector */}
                 <td className="px-4 py-5">
                   <div className="flex items-center gap-3">
-                    <Image
-                      src={
-                        visit.inspector_photo ?? "/images/default-avatar.jpg"
-                      }
-                      alt={visit.inspector}
-                      width={42}
-                      height={42}
-                      className="rounded-full border border-slate-200 object-cover"
-                    />
+                    <div className="relative h-12 w-12 overflow-hidden rounded-full border border-slate-200 bg-slate-100">
+                      <Image
+                        src={
+                          visit.inspector_photo ?? "/images/default-avatar.jpg"
+                        }
+                        alt={visit.inspector}
+                        fill
+                        sizes="40px"
+                        className="object-cover"
+                      />
+                    </div>
 
                     <div>
                       <p className="font-medium text-slate-900">
                         {visit.inspector}
                       </p>
 
-                      <p className="text-xs text-slate-500">Inspector</p>
+                      <span className="mt-1 inline-flex rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
+                        {visit.inspector_role}
+                      </span>
                     </div>
                   </div>
                 </td>
-
                 {/* Location */}
                 <td className="px-4 py-5">
                   <div className="flex items-start gap-3">
@@ -166,7 +167,6 @@ export function VisitTable({ visits, loading = false }: Props) {
                     </div>
                   </div>
                 </td>
-
                 {/* Weather */}
                 <td className="px-4 py-5 text-center">
                   <span className="inline-flex items-center gap-2 rounded-full bg-sky-50 px-3 py-2 text-sm font-medium text-sky-700">
@@ -175,7 +175,6 @@ export function VisitTable({ visits, loading = false }: Props) {
                     {visit.weather}
                   </span>
                 </td>
-
                 {/* Duration */}
                 <td className="px-4 py-5 text-center">
                   <span className="inline-flex items-center gap-2 rounded-full bg-orange-50 px-3 py-2 text-sm font-medium text-orange-700">
@@ -183,7 +182,6 @@ export function VisitTable({ visits, loading = false }: Props) {
                     {visit.duration} min
                   </span>
                 </td>
-
                 {/* Photos */}
                 <td className="px-4 py-5 text-center">
                   <span className="inline-flex items-center gap-2 rounded-full bg-pink-50 px-3 py-2 text-sm font-medium text-pink-700">
@@ -192,7 +190,6 @@ export function VisitTable({ visits, loading = false }: Props) {
                     {visit.total_photos}
                   </span>
                 </td>
-
                 {/* Attachments */}
                 <td className="px-4 py-5 text-center">
                   <span className="inline-flex items-center gap-2 rounded-full bg-amber-50 px-3 py-2 text-sm font-medium text-amber-700">
@@ -201,7 +198,6 @@ export function VisitTable({ visits, loading = false }: Props) {
                     {visit.total_attachments}
                   </span>
                 </td>
-
                 {/* Action */}
                 <td className="sticky right-0 bg-white px-6 py-5 text-right">
                   <Link

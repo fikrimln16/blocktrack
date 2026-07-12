@@ -13,6 +13,7 @@ export interface VisitListItem {
 
   inspector: string;
   inspector_photo: string | null;
+  inspector_role: string;
 
   ama: string;
   estate: string;

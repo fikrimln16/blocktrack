@@ -162,6 +162,7 @@ export async function getVisitListRepository(
 
       u.name AS inspector,
       u.photo AS inspector_photo,
+      u.role AS inspector_role,
 
       a.name AS ama,
 
