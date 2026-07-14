@@ -68,10 +68,10 @@ function getPageInfo(pathname: string) {
     };
   }
 
-  if (pathname === "/estates") {
+  if (pathname === "/attachments") {
     return {
-      title: "Estate Management",
-      description: "Manage plantation estates",
+      title: "Attachments Management",
+      description: "Manage and view the attachment",
     };
   }
 

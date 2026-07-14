@@ -56,11 +56,11 @@ const menus = [
     href: "/gallery",
     icon: ImageIcon,
   },
-  // {
-  //   title: "Reports",
-  //   href: "/reports",
-  //   icon: FileText,
-  // },
+  {
+    title: "Attachment",
+    href: "/attachments",
+    icon: FileText,
+  },
   // {
   //   title: "Analytics",
   //   href: "/analytics",
