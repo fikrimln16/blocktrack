@@ -67,3 +67,29 @@ export interface CreateAttachmentPayload {
 
   visit_ids: number[];
 }
+
+export interface AttachmentDetail {
+  id: number;
+
+  ama_id: number;
+  estate_id: number;
+
+  ama: string;
+  estate: string;
+
+  title: string;
+  description: string | null;
+
+  file_name: string;
+  file_url: string;
+
+  mime_type: string;
+  extension: string;
+  file_size: number;
+
+  uploaded_by: number;
+  uploader: string;
+
+  created_at: string;
+  updated_at: string;
+}

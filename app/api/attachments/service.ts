@@ -1,10 +1,12 @@
 import {
   createAttachmentRepository,
+  getAttachmentByIdRepository,
   getAttachmentFilterRepository,
   getAttachmentFormRepository,
   getAttachmentListRepository,
   getAttachmentStatisticsRepository,
   getVisitsByEstateRepository,
+  deleteAttachmentRepository,
 } from "@/repositories/attachment.repository";
 
 import { AttachmentListQuery, CreateAttachmentRequest } from "./validation";
@@ -63,4 +65,22 @@ export async function createAttachmentService(
  */
 export async function getAttachmentStatisticsService() {
   return await getAttachmentStatisticsRepository();
+}
+
+/**
+ * ============================================
+ * Get Attachment Detail
+ * ============================================
+ */
+export async function getAttachmentByIdService(id: number) {
+  return await getAttachmentByIdRepository(id);
+}
+
+/**
+ * ============================================
+ * Delete Attachment
+ * ============================================
+ */
+export async function deleteAttachmentService(id: number) {
+  return await deleteAttachmentRepository(id);
 }

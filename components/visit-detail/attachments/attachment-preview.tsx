@@ -91,9 +91,10 @@ export function AttachmentPreview({
             </Link>
 
             <Link
-              href={attachment.file_url}
-              download
-              className="rounded-xl bg-white/10 p-3 hover:bg-white/20"
+              href={`/api/attachments/${attachment.id}/download`}
+              target="_blank"
+              className="rounded-lg p-2 text-slate-600 transition hover:bg-slate-100"
+              title="Download"
             >
               <Download size={18} />
             </Link>

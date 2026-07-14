@@ -4,6 +4,7 @@ import db from "@/lib/db";
 
 import {
   Attachment,
+  AttachmentDetail,
   AttachmentListQuery,
   AttachmentListResponse,
 } from "@/types/attachment";
@@ -418,4 +419,116 @@ export async function getAttachmentFilterRepository(): Promise<AttachmentFilterD
     estates,
     uploaders,
   };
+}
+
+interface AttachmentDetailRow extends RowDataPacket, AttachmentDetail {}
+
+export async function getAttachmentByIdRepository(
+  id: number,
+): Promise<AttachmentDetail | null> {
+  const [rows] = await db.query<AttachmentDetailRow[]>(
+    `
+    SELECT
+      att.id,
+
+      att.ama_id,
+      att.estate_id,
+
+      a.name AS ama,
+      e.name AS estate,
+
+      att.title,
+      att.description,
+
+      att.file_name,
+      att.file_url,
+
+      att.mime_type,
+      att.extension,
+      att.file_size,
+
+      att.uploaded_by,
+
+      u.name AS uploader,
+
+      att.created_at,
+      att.updated_at
+
+    FROM attachments att
+
+    INNER JOIN amas a
+      ON a.id = att.ama_id
+
+    INNER JOIN estates e
+      ON e.id = att.estate_id
+
+    INNER JOIN users u
+      ON u.id = att.uploaded_by
+
+    WHERE att.id = ?
+
+    LIMIT 1
+    `,
+    [id],
+  );
+
+  if (rows.length === 0) {
+    return null;
+  }
+
+  return rows[0];
+}
+
+export async function deleteAttachmentRepository(
+  id: number,
+): Promise<string | null> {
+  const conn = await db.getConnection();
+
+  try {
+    await conn.beginTransaction();
+
+    const [rows]: any = await conn.query(
+      `
+      SELECT
+        file_url
+      FROM attachments
+      WHERE id = ?
+      LIMIT 1
+      `,
+      [id],
+    );
+
+    if (rows.length === 0) {
+      throw new Error("Attachment not found.");
+    }
+
+    const fileUrl = rows[0].file_url as string;
+
+    await conn.query(
+      `
+      DELETE
+      FROM attachment_visits
+      WHERE attachment_id = ?
+      `,
+      [id],
+    );
+
+    await conn.query(
+      `
+      DELETE
+      FROM attachments
+      WHERE id = ?
+      `,
+      [id],
+    );
+
+    await conn.commit();
+
+    return fileUrl;
+  } catch (error) {
+    await conn.rollback();
+    throw error;
+  } finally {
+    conn.release();
+  }
 }

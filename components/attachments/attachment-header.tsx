@@ -17,8 +17,10 @@ interface Props {
   totalUploaders: number;
 }
 
-function formatBytes(bytes: number) {
-  if (bytes === 0) return "0 B";
+function formatBytes(bytes?: number | null) {
+  if (bytes == null || Number.isNaN(bytes) || bytes <= 0) {
+    return "0 B";
+  }
 
   const units = ["B", "KB", "MB", "GB", "TB"];
   const index = Math.floor(Math.log(bytes) / Math.log(1024));
@@ -72,7 +74,7 @@ export function AttachmentHeader({
         <SummaryCard
           icon={<FileArchive size={22} className="text-amber-600" />}
           title="Storage Used"
-          value={formatBytes(totalSize)}
+          value={formatBytes(totalSize ?? 0)}
           color="bg-amber-50"
         />
 
