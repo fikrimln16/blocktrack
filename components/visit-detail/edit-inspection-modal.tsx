@@ -84,7 +84,7 @@ const TM_SECTIONS = [
     ],
   },
   {
-    title: "🌧 Drainase",
+    title: "🌧 Kondisi Alam",
     fields: [
       ["kondisi_drainase_blok", "Drainase Blok"],
       ["parit", "Parit"],
@@ -92,11 +92,12 @@ const TM_SECTIONS = [
     ],
   },
   {
-    title: "👷 Manajemen Kebun",
-    fields: [
-      ["pencurian", "Pencurian"],
-      ["pemupukan", "Pemupukan"],
-    ],
+    title: "🤝 Kondisi Sosial",
+    fields: [["pencurian", "Pencurian"]],
+  },
+  {
+    title: "📋 Manajemen Kebun",
+    fields: [["pemupukan", "Pemupukan"]],
   },
 ];
 

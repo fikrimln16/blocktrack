@@ -9,6 +9,7 @@ import {
   CloudRain,
   Briefcase,
   Pencil,
+  ShieldAlert,
 } from "lucide-react";
 
 import { VisitDetail } from "@/types/visit-detail";
@@ -71,12 +72,14 @@ const sections = [
     ],
   },
   {
+    title: "Kondisi Sosial",
+    icon: ShieldAlert,
+    items: [["Pencurian", "pencurian"]],
+  },
+  {
     title: "Manajemen Kebun",
     icon: Briefcase,
-    items: [
-      ["Pencurian", "pencurian"],
-      ["Pemupukan", "pemupukan"],
-    ],
+    items: [["Pemupukan", "pemupukan"]],
   },
 ];
 
