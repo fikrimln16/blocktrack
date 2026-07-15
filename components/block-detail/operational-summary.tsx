@@ -4,10 +4,9 @@ import {
   CalendarClock,
   Camera,
   ClipboardList,
+  ClipboardCheck,
   User,
-  Trees,
   Clock3,
-  Activity,
   CloudSun,
   Paperclip,
 } from "lucide-react";
@@ -26,56 +25,6 @@ function formatDate(date: Date | string | null) {
   }).format(new Date(date));
 }
 
-function formatDuration(minutes?: number | null) {
-  if (!minutes) return "-";
-
-  const hour = Math.floor(minutes / 60);
-  const minute = minutes % 60;
-
-  if (hour === 0) return `${minute} min`;
-  if (minute === 0) return `${hour} hr`;
-
-  return `${hour} hr ${minute} min`;
-}
-
-function getHealth(score?: number) {
-  if (!score) {
-    return {
-      text: "-",
-      color: "text-slate-500",
-    };
-  }
-
-  if (score >= 90)
-    return {
-      text: "Excellent",
-      color: "text-green-600",
-    };
-
-  if (score >= 70)
-    return {
-      text: "Good",
-      color: "text-emerald-600",
-    };
-
-  if (score >= 50)
-    return {
-      text: "Fair",
-      color: "text-yellow-600",
-    };
-
-  if (score >= 30)
-    return {
-      text: "Poor",
-      color: "text-orange-600",
-    };
-
-  return {
-    text: "Very Poor",
-    color: "text-red-600",
-  };
-}
-
 function formatDateTime(date: Date | string | null) {
   if (!date) return "-";
 
@@ -86,6 +35,67 @@ function formatDateTime(date: Date | string | null) {
     hour: "2-digit",
     minute: "2-digit",
   }).format(new Date(date));
+}
+
+function formatDuration(minutes?: number | null) {
+  if (minutes == null) {
+    return "-";
+  }
+
+  const hour = Math.floor(minutes / 60);
+  const minute = minutes % 60;
+
+  if (hour === 0) {
+    return `${minute} menit`;
+  }
+
+  if (minute === 0) {
+    return `${hour} jam`;
+  }
+
+  return `${hour} jam ${minute} menit`;
+}
+
+/**
+ * Skor menggunakan skala 1 - 3
+ * 1 = Perlu Perbaikan
+ * 2 = Cukup
+ * 3 = Baik
+ */
+function getHealth(score?: number | null) {
+  if (score == null) {
+    return {
+      text: "Belum Dinilai",
+      color: "text-slate-500",
+      bg: "bg-slate-100",
+      progress: 0,
+    };
+  }
+
+  if (score >= 2.5) {
+    return {
+      text: "Baik",
+      color: "text-green-600",
+      bg: "bg-green-500",
+      progress: (score / 3) * 100,
+    };
+  }
+
+  if (score >= 1.5) {
+    return {
+      text: "Cukup",
+      color: "text-yellow-600",
+      bg: "bg-yellow-500",
+      progress: (score / 3) * 100,
+    };
+  }
+
+  return {
+    text: "Perlu Perbaikan",
+    color: "text-red-600",
+    bg: "bg-red-500",
+    progress: (score / 3) * 100,
+  };
 }
 
 export function OperationalSummary({ block }: Props) {
@@ -131,7 +141,7 @@ export function OperationalSummary({ block }: Props) {
     },
     {
       icon: Clock3,
-      title: "Avg. Duration",
+      title: "Average Duration",
       value: formatDuration(block.average_duration),
     },
     {
@@ -143,6 +153,7 @@ export function OperationalSummary({ block }: Props) {
 
   return (
     <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+      {/* Header */}
       <div className="border-b border-slate-200 px-6 py-5">
         <h2 className="text-lg font-semibold">Operational Summary</h2>
 
@@ -151,6 +162,7 @@ export function OperationalSummary({ block }: Props) {
         </p>
       </div>
 
+      {/* Summary */}
       <div className="space-y-1 px-4 py-3">
         {data.map((item) => (
           <div
@@ -171,23 +183,70 @@ export function OperationalSummary({ block }: Props) {
           </div>
         ))}
 
-        <div className="mt-2 rounded-2xl bg-blue-50 p-4">
+        {/* Tree Information */}
+        {/* <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-slate-500">Planting Year</p>
+
+              <p className="mt-1 text-lg font-semibold text-slate-900">
+                {block.planting_year ?? "-"}
+              </p>
+            </div>
+
+            <div className="text-right">
+              <p className="text-sm text-slate-500">Tree Age</p>
+
+              <p className="mt-1 text-lg font-semibold text-slate-900">
+                {treeAge === "-" ? "-" : `${treeAge} Tahun`}
+              </p>
+            </div>
+          </div>
+        </div> */}
+
+        {/* Average Inspection Score */}
+        <div className="mt-4 rounded-2xl bg-blue-50 p-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Activity size={20} className="text-blue-600" />
+              <ClipboardCheck size={20} className="text-blue-600" />
 
               <div>
-                <p className="text-sm font-medium">Average Health Score</p>
+                <p className="text-sm font-semibold text-slate-800">
+                  Average Inspection Score
+                </p>
 
-                <p className={`text-xs ${health.color}`}>{health.text}</p>
+                <p className={`text-xs font-medium ${health.color}`}>
+                  {health.text}
+                </p>
               </div>
             </div>
 
-            <span className="text-3xl font-bold text-blue-600">
-              {block.average_score
-                ? `${Math.round(block.average_score)}%`
-                : "-"}
-            </span>
+            <div className="text-right">
+              <p className="text-3xl font-bold text-blue-700">
+                {block.average_score != null
+                  ? Number(block.average_score).toFixed(2)
+                  : "-"}
+              </p>
+
+              <p className="text-xs text-slate-500">Max Score 3.00</p>
+            </div>
+          </div>
+
+          <div className="mt-5">
+            <div className="h-2 overflow-hidden rounded-full bg-white">
+              <div
+                className={`h-full rounded-full transition-all duration-500 ${health.bg}`}
+                style={{
+                  width: `${health.progress}%`,
+                }}
+              />
+            </div>
+
+            <div className="mt-2 flex justify-between text-[11px] text-slate-500">
+              <span>1</span>
+              <span>2</span>
+              <span>3</span>
+            </div>
           </div>
         </div>
       </div>

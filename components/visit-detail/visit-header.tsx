@@ -100,10 +100,10 @@ export function VisitHeader({ visit }: Props) {
             Delete
           </button>
 
-          <button className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-white hover:bg-blue-700">
+          {/* <button className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-white hover:bg-blue-700">
             <Pencil size={18} />
             Edit
-          </button>
+          </button> */}
         </div>
       </div>
 

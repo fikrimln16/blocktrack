@@ -1,38 +1,106 @@
 export interface VisitFormValues {
-  user_id: number;
-  visit_date: string;
-  visit_time: string;
-  weather: string;
-  duration: number;
+  // ===========================
+  // General Information
+  // ===========================
+  block_id: number;
+  user_id?: number;
 
   latitude?: number;
   longitude?: number;
   accuracy?: number;
 
-  plant_population?: number;
-  plant_infill?: number;
-  termite?: number;
-  orcytes?: number;
-  pest?: number;
-  leaf_caterpillar?: number;
+  weather?: string;
+  notes?: string;
+
+  visit_date?: string;
+  visit_time?: string;
+  duration?: number;
+
+  status?: string;
+
+  /**
+   * Jenis tanaman.
+   * Nilai ini dapat diisi otomatis dari block yang dipilih.
+   */
+  planting_type?: "TM" | "TBM";
+
+  // ===========================
+  // A. Kondisi Tanaman
+  // ===========================
+
+  produksi?: number;
+
+  populasi_pokok?: number;
+
+  kuantitas_sisipan?: number;
+
+  kuantitas_sisipan_3_5_tahun?: number;
+
+  ganoderma?: number;
+
+  rayap?: number;
+
+  hama_oryctes?: number;
+
+  tikus_babi_other_pest?: number;
+
+  ulat_pemakan_daun?: number;
+
   beneficial_weed?: number;
 
-  circle_condition?: number;
-  harvesting_path?: number;
-  interrow?: number;
-  tph_condition?: number;
-  sanitation?: number;
-  cover_crop?: number;
+  // ===========================
+  // B. Kondisi Kebun
+  // ===========================
 
-  road_condition?: number;
-  bridge_condition?: number;
-  footbridge_condition?: number;
+  piringan?: number;
 
-  drainage_condition?: number;
-  ditch_condition?: number;
-  monitoring_well?: number;
+  pasar_panen?: number;
 
-  fertilizing?: number;
+  pasar_rintis?: number;
 
-  notes: string;
+  tunas_pokok?: number;
+
+  gawangan_mineral_gambut?: number;
+
+  tph?: number;
+
+  sanitasi_kastrasi?: number;
+
+  perawatan_kacangan?: number;
+
+  nomor_dan_kebersihan_tph?: number;
+
+  // ===========================
+  // C. Infrastruktur
+  // ===========================
+
+  jalan?: number;
+
+  jembatan?: number;
+
+  titi_panen?: number;
+
+  titi_rintis?: number;
+
+  // ===========================
+  // D. Lingkungan
+  // ===========================
+
+  kondisi_drainase_blok?: number;
+
+  parit?: number;
+
+  sumur_pantau?: number;
+
+  // ===========================
+  // E. Sosial
+  // ===========================
+
+  pencurian?: number;
+
+  // ===========================
+  // F. Pemeliharaan
+  // ===========================
+
+  pemupukan?: number;
 }

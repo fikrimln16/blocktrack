@@ -29,12 +29,20 @@ export function VisitOverview({ visit }: Props) {
       <div className="grid gap-4 md:grid-cols-2">
         <InfoItem icon={Hash} label="Visit Code" value={visit.visit_code} />
 
-        <InfoItem icon={Clock3} label="Visit Time" value={visit.visit_time} />
+        <InfoItem
+          icon={CalendarClock}
+          label="Visit Date"
+          value={new Date(visit.visit_date).toLocaleDateString("id-ID", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+          })}
+        />
 
         <InfoItem
-          icon={MapPin}
-          label="GPS Accuracy"
-          value={`${visit.accuracy ?? "-"} m`}
+          icon={Clock3}
+          label="Duration"
+          value={`${visit.duration} Minutes`}
         />
 
         <InfoItem
@@ -47,16 +55,16 @@ export function VisitOverview({ visit }: Props) {
           }
         />
 
-        <InfoItem
-          icon={CalendarClock}
-          label="Created At"
-          value={new Date(visit.created_at).toLocaleString("id-ID")}
-        />
+        <InfoItem icon={CalendarSync} label="Weather" value={visit.weather} />
 
         <InfoItem
-          icon={CalendarSync}
-          label="Updated At"
-          value={new Date(visit.updated_at).toLocaleString("id-ID")}
+          icon={MapPin}
+          label="Planting Type"
+          value={
+            visit.planting_type === "TM"
+              ? "🌴 TM - Tanaman Menghasilkan"
+              : "🌱 TBM - Tanaman Belum Menghasilkan"
+          }
         />
       </div>
     </div>

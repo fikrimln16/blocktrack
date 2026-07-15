@@ -28,30 +28,46 @@ export async function getVisitDetail(id: number): Promise<VisitDetail> {
       -- ======================
       -- Inspection
       -- ======================
-      v.plant_population,
-      v.plant_infill,
-      v.termite,
-      v.orcytes,
-      v.pest,
-      v.leaf_caterpillar,
+
+      v.planting_type,
+
+      -- Kondisi Tanaman
+      v.produksi,
+      v.populasi_pokok,
+      v.kuantitas_sisipan,
+      v.kuantitas_sisipan_3_5_tahun,
+      v.ganoderma,
+      v.rayap,
+      v.hama_oryctes,
+      v.tikus_babi_other_pest,
+      v.ulat_pemakan_daun,
       v.beneficial_weed,
 
-      v.circle_condition,
-      v.harvesting_path,
-      v.interrow,
-      v.tph_condition,
-      v.sanitation,
-      v.cover_crop,
+      -- Kondisi Kebun
+      v.piringan,
+      v.pasar_panen,
+      v.pasar_rintis,
+      v.tunas_pokok,
+      v.gawangan_mineral_gambut,
+      v.nomor_dan_kebersihan_tph,
+      v.tph,
+      v.sanitasi_kastrasi,
+      v.perawatan_kacangan,
 
-      v.road_condition,
-      v.bridge_condition,
-      v.footbridge_condition,
+      -- Infrastruktur
+      v.jalan,
+      v.jembatan,
+      v.titi_panen,
+      v.titi_rintis,
 
-      v.drainage_condition,
-      v.ditch_condition,
-      v.monitoring_well,
+      -- Drainase
+      v.kondisi_drainase_blok,
+      v.parit,
+      v.sumur_pantau,
 
-      v.fertilizing,
+      -- Manajemen
+      v.pencurian,
+      v.pemupukan,
 
       v.created_at,
       v.updated_at,
@@ -179,8 +195,59 @@ export async function getVisitDetail(id: number): Promise<VisitDetail> {
     polygon = null;
   }
 
+  const inspection = {
+    planting_type: visit.planting_type,
+
+    plant: {
+      produksi: visit.produksi,
+      populasi_pokok: visit.populasi_pokok,
+      kuantitas_sisipan: visit.kuantitas_sisipan,
+      kuantitas_sisipan_3_5_tahun: visit.kuantitas_sisipan_3_5_tahun,
+      ganoderma: visit.ganoderma,
+      rayap: visit.rayap,
+      hama_oryctes: visit.hama_oryctes,
+      tikus_babi_other_pest: visit.tikus_babi_other_pest,
+      ulat_pemakan_daun: visit.ulat_pemakan_daun,
+      beneficial_weed: visit.beneficial_weed,
+    },
+
+    field: {
+      piringan: visit.piringan,
+      pasar_panen: visit.pasar_panen,
+      pasar_rintis: visit.pasar_rintis,
+      tunas_pokok: visit.tunas_pokok,
+      gawangan_mineral_gambut: visit.gawangan_mineral_gambut,
+      nomor_dan_kebersihan_tph: visit.nomor_dan_kebersihan_tph,
+      tph: visit.tph,
+      sanitasi_kastrasi: visit.sanitasi_kastrasi,
+      perawatan_kacangan: visit.perawatan_kacangan,
+    },
+
+    infrastructure: {
+      jalan: visit.jalan,
+      jembatan: visit.jembatan,
+      titi_panen: visit.titi_panen,
+      titi_rintis: visit.titi_rintis,
+    },
+
+    drainage: {
+      kondisi_drainase_blok: visit.kondisi_drainase_blok,
+      parit: visit.parit,
+      sumur_pantau: visit.sumur_pantau,
+    },
+
+    management: {
+      pencurian: visit.pencurian,
+      pemupukan: visit.pemupukan,
+    },
+  };
+
   return {
     ...visit,
+
+    inspection,
+
+    planting_type: visit.planting_type,
 
     photo: visit.photo
       ? `/api/storage/uploads/photos/${visit.photo}`

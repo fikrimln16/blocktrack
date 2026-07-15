@@ -41,6 +41,7 @@ export function VisitForm({ block, users }: Props) {
   } = useForm<VisitFormValues>({
     defaultValues: {
       user_id: undefined,
+
       visit_date: new Date().toISOString().slice(0, 10),
       visit_time: new Date().toTimeString().slice(0, 5),
 
@@ -50,6 +51,8 @@ export function VisitForm({ block, users }: Props) {
       latitude: undefined,
       longitude: undefined,
       accuracy: undefined,
+
+      planting_type: undefined,
 
       notes: "",
     },
@@ -73,6 +76,10 @@ export function VisitForm({ block, users }: Props) {
         throw new Error("Please capture the GPS location.");
       }
 
+      if (!data.planting_type) {
+        throw new Error("Please select TM or TBM.");
+      }
+
       if (photos.length === 0) {
         throw new Error("Please upload at least one photo.");
       }
@@ -91,30 +98,94 @@ export function VisitForm({ block, users }: Props) {
         longitude: Number(data.longitude),
         accuracy: data.accuracy != null ? Number(data.accuracy) : null,
 
-        plant_population: data.plant_population ?? null,
-        plant_infill: data.plant_infill ?? null,
-        termite: data.termite ?? null,
-        orcytes: data.orcytes ?? null,
-        pest: data.pest ?? null,
-        leaf_caterpillar: data.leaf_caterpillar ?? null,
+        planting_type: data.planting_type,
+
+        // ===========================
+        // TM
+        // ===========================
+        produksi: data.planting_type === "TM" ? (data.produksi ?? null) : null,
+
+        populasi_pokok: data.populasi_pokok ?? null,
+
+        kuantitas_sisipan_3_5_tahun:
+          data.planting_type === "TM"
+            ? (data.kuantitas_sisipan_3_5_tahun ?? null)
+            : null,
+
+        ganoderma:
+          data.planting_type === "TM" ? (data.ganoderma ?? null) : null,
+
+        pasar_panen:
+          data.planting_type === "TM" ? (data.pasar_panen ?? null) : null,
+
+        tunas_pokok:
+          data.planting_type === "TM" ? (data.tunas_pokok ?? null) : null,
+
+        nomor_dan_kebersihan_tph:
+          data.planting_type === "TM"
+            ? (data.nomor_dan_kebersihan_tph ?? null)
+            : null,
+
+        titi_panen:
+          data.planting_type === "TM" ? (data.titi_panen ?? null) : null,
+
+        pencurian:
+          data.planting_type === "TM" ? (data.pencurian ?? null) : null,
+
+        // ===========================
+        // TBM
+        // ===========================
+        kuantitas_sisipan:
+          data.planting_type === "TBM"
+            ? (data.kuantitas_sisipan ?? null)
+            : null,
+
+        pasar_rintis:
+          data.planting_type === "TBM" ? (data.pasar_rintis ?? null) : null,
+
+        tph: data.planting_type === "TBM" ? (data.tph ?? null) : null,
+
+        sanitasi_kastrasi:
+          data.planting_type === "TBM"
+            ? (data.sanitasi_kastrasi ?? null)
+            : null,
+
+        perawatan_kacangan:
+          data.planting_type === "TBM"
+            ? (data.perawatan_kacangan ?? null)
+            : null,
+
+        titi_rintis:
+          data.planting_type === "TBM" ? (data.titi_rintis ?? null) : null,
+
+        // ===========================
+        // Digunakan TM & TBM
+        // ===========================
+        rayap: data.rayap ?? null,
+
+        hama_oryctes: data.hama_oryctes ?? null,
+
+        tikus_babi_other_pest: data.tikus_babi_other_pest ?? null,
+
+        ulat_pemakan_daun: data.ulat_pemakan_daun ?? null,
+
         beneficial_weed: data.beneficial_weed ?? null,
 
-        circle_condition: data.circle_condition ?? null,
-        harvesting_path: data.harvesting_path ?? null,
-        interrow: data.interrow ?? null,
-        tph_condition: data.tph_condition ?? null,
-        sanitation: data.sanitation ?? null,
-        cover_crop: data.cover_crop ?? null,
+        piringan: data.piringan ?? null,
 
-        road_condition: data.road_condition ?? null,
-        bridge_condition: data.bridge_condition ?? null,
-        footbridge_condition: data.footbridge_condition ?? null,
+        gawangan_mineral_gambut: data.gawangan_mineral_gambut ?? null,
 
-        drainage_condition: data.drainage_condition ?? null,
-        ditch_condition: data.ditch_condition ?? null,
-        monitoring_well: data.monitoring_well ?? null,
+        jalan: data.jalan ?? null,
 
-        fertilizing: data.fertilizing ?? null,
+        jembatan: data.jembatan ?? null,
+
+        kondisi_drainase_blok: data.kondisi_drainase_blok ?? null,
+
+        parit: data.parit ?? null,
+
+        sumur_pantau: data.sumur_pantau ?? null,
+
+        pemupukan: data.pemupukan ?? null,
 
         notes: data.notes ?? "",
       };

@@ -10,7 +10,7 @@ export function DocumentationHeader({ photos }: Props) {
   const latestPhoto = photos.length > 0 ? photos[photos.length - 1] : null;
 
   return (
-    <div className="grid gap-4 md:grid-cols-3">
+    <div className="grid gap-4 md:grid-cols-2">
       <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
         <div className="flex items-center justify-between">
           <p className="text-sm text-slate-500">Total Photos</p>
@@ -23,7 +23,7 @@ export function DocumentationHeader({ photos }: Props) {
         </h3>
       </div>
 
-      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+      {/* <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
         <div className="flex items-center justify-between">
           <p className="text-sm text-slate-500">Categories</p>
 
@@ -33,7 +33,7 @@ export function DocumentationHeader({ photos }: Props) {
         <h3 className="mt-3 text-3xl font-bold text-slate-900">
           {new Set(photos.map((p) => p.category).filter(Boolean)).size}
         </h3>
-      </div>
+      </div> */}
 
       <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
         <div className="flex items-center justify-between">

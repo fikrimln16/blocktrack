@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import {
   ClipboardCheck,
   Leaf,
@@ -5,9 +8,12 @@ import {
   Construction,
   CloudRain,
   Briefcase,
+  Pencil,
 } from "lucide-react";
 
 import { VisitDetail } from "@/types/visit-detail";
+
+import { EditInspectionModal } from "./edit-inspection-modal";
 
 interface Props {
   visit: VisitDetail;
@@ -15,192 +21,307 @@ interface Props {
 
 const sections = [
   {
-    title: "Plant Condition",
+    title: "Kondisi Tanaman",
     icon: Leaf,
     items: [
-      ["Plant Population", "plant_population"],
-      ["Infill Quantity", "plant_infill"],
-      ["Termite", "termite"],
-      ["Oryctes Pest", "orcytes"],
-      ["Rat / Other Pest", "pest"],
-      ["Leaf Caterpillar", "leaf_caterpillar"],
+      ["Produksi", "produksi"],
+      ["Populasi Pokok", "populasi_pokok"],
+      ["Kuantitas Sisipan", "kuantitas_sisipan"],
+      ["Kuantitas Sisipan (3-5 Tahun)", "kuantitas_sisipan_3_5_tahun"],
+      ["Ganoderma", "ganoderma"],
+      ["Rayap", "rayap"],
+      ["Hama Oryctes", "hama_oryctes"],
+      ["Tikus / Babi / Hama Lain", "tikus_babi_other_pest"],
+      ["Ulat Pemakan Daun", "ulat_pemakan_daun"],
       ["Beneficial Weed", "beneficial_weed"],
     ],
   },
   {
-    title: "Field Condition",
+    title: "Kondisi Kebun",
     icon: Trees,
     items: [
-      ["Circle", "circle_condition"],
-      ["Harvesting Path", "harvesting_path"],
-      ["Interrow", "interrow"],
-      ["TPH", "tph_condition"],
-      ["Sanitation", "sanitation"],
-      ["Cover Crop", "cover_crop"],
+      ["Piringan", "piringan"],
+      ["Pasar Panen", "pasar_panen"],
+      ["Pasar Rintis", "pasar_rintis"],
+      ["Tunas Pokok", "tunas_pokok"],
+      ["Gawangan Mineral / Gambut", "gawangan_mineral_gambut"],
+      ["Nomor & Kebersihan TPH", "nomor_dan_kebersihan_tph"],
+      ["TPH", "tph"],
+      ["Sanitasi / Kastrasi", "sanitasi_kastrasi"],
+      ["Perawatan Kacangan", "perawatan_kacangan"],
     ],
   },
   {
-    title: "Infrastructure",
+    title: "Infrastruktur",
     icon: Construction,
     items: [
-      ["Road", "road_condition"],
-      ["Bridge", "bridge_condition"],
-      ["Footbridge", "footbridge_condition"],
+      ["Jalan", "jalan"],
+      ["Jembatan", "jembatan"],
+      ["Titi Panen", "titi_panen"],
+      ["Titi Rintis", "titi_rintis"],
     ],
   },
   {
-    title: "Environment",
+    title: "Drainase",
     icon: CloudRain,
     items: [
-      ["Drainage", "drainage_condition"],
-      ["Ditch", "ditch_condition"],
-      ["Monitoring Well", "monitoring_well"],
+      ["Drainase Blok", "kondisi_drainase_blok"],
+      ["Parit", "parit"],
+      ["Sumur Pantau", "sumur_pantau"],
     ],
   },
   {
-    title: "Management",
+    title: "Manajemen Kebun",
     icon: Briefcase,
-    items: [["Fertilizing", "fertilizing"]],
+    items: [
+      ["Pencurian", "pencurian"],
+      ["Pemupukan", "pemupukan"],
+    ],
   },
 ];
 
 function getBadge(score: number | null) {
-  if (score == null || score === 0) {
-    return {
-      label: "Not Assessed",
-      className: "bg-slate-100 text-slate-500",
-    };
+  switch (score) {
+    case 1:
+      return {
+        label: "Buruk",
+        className: "bg-red-100 text-red-700",
+      };
+
+    case 2:
+      return {
+        label: "Sedang",
+        className: "bg-yellow-100 text-yellow-700",
+      };
+
+    case 3:
+      return {
+        label: "Baik",
+        className: "bg-green-100 text-green-700",
+      };
+
+    default:
+      return {
+        label: "-",
+        className: "bg-slate-100 text-slate-500",
+      };
   }
-
-  if (score >= 90)
-    return {
-      label: "Excellent",
-      className: "bg-green-100 text-green-700",
-    };
-
-  if (score >= 70)
-    return {
-      label: "Good",
-      className: "bg-emerald-100 text-emerald-700",
-    };
-
-  if (score >= 50)
-    return {
-      label: "Fair",
-      className: "bg-yellow-100 text-yellow-700",
-    };
-
-  if (score >= 30)
-    return {
-      label: "Poor",
-      className: "bg-orange-100 text-orange-700",
-    };
-
-  return {
-    label: "Very Poor",
-    className: "bg-red-100 text-red-700",
-  };
 }
 
 export function VisitInspection({ visit }: Props) {
+  const [open, setOpen] = useState(false);
+
+  const visibleSections =
+    visit.planting_type === "TM"
+      ? sections.map((section) => {
+          if (section.title === "Kondisi Tanaman") {
+            return {
+              ...section,
+              items: section.items.filter(
+                ([, key]) => key !== "kuantitas_sisipan",
+              ),
+            };
+          }
+
+          if (section.title === "Kondisi Kebun") {
+            return {
+              ...section,
+              items: section.items.filter(
+                ([, key]) =>
+                  ![
+                    "pasar_rintis",
+                    "tph",
+                    "sanitasi_kastrasi",
+                    "perawatan_kacangan",
+                  ].includes(key),
+              ),
+            };
+          }
+
+          if (section.title === "Infrastruktur") {
+            return {
+              ...section,
+              items: section.items.filter(([, key]) => key !== "titi_rintis"),
+            };
+          }
+
+          if (section.title === "Manajemen Kebun") {
+            return {
+              ...section,
+              items: section.items,
+            };
+          }
+
+          return section;
+        })
+      : sections.map((section) => {
+          if (section.title === "Kondisi Tanaman") {
+            return {
+              ...section,
+              items: section.items.filter(
+                ([, key]) =>
+                  ![
+                    "produksi",
+                    "ganoderma",
+                    "kuantitas_sisipan_3_5_tahun",
+                  ].includes(key),
+              ),
+            };
+          }
+
+          if (section.title === "Kondisi Kebun") {
+            return {
+              ...section,
+              items: section.items.filter(
+                ([, key]) =>
+                  ![
+                    "pasar_panen",
+                    "tunas_pokok",
+                    "nomor_dan_kebersihan_tph",
+                  ].includes(key),
+              ),
+            };
+          }
+
+          if (section.title === "Infrastruktur") {
+            return {
+              ...section,
+              items: section.items.filter(([, key]) => key !== "titi_panen"),
+            };
+          }
+
+          if (section.title === "Manajemen Kebun") {
+            return {
+              ...section,
+              items: section.items.filter(([, key]) => key !== "pencurian"),
+            };
+          }
+
+          return section;
+        });
+
   return (
-    <section className="rounded-3xl border border-slate-200 bg-white shadow-sm">
-      {/* Header */}
-      <div className="border-b border-slate-200 px-8 py-6">
-        <div className="flex items-center gap-3">
-          <ClipboardCheck size={22} className="text-blue-600" />
+    <>
+      <section className="rounded-3xl border border-slate-200 bg-white shadow-sm">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-slate-200 px-8 py-6">
+          <div className="flex items-center gap-3">
+            <ClipboardCheck className="text-blue-600" size={22} />
 
-          <div>
-            <h2 className="text-xl font-semibold">Inspection Assessment</h2>
+            <div>
+              <h2 className="text-xl font-semibold">Inspection Assessment</h2>
 
-            <p className="text-sm text-slate-500">
-              Plantation condition assessment during inspection.
-            </p>
+              <p className="text-sm text-slate-500">
+                Plantation inspection result.
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className="inline-flex items-center gap-2 rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium transition hover:bg-slate-50"
+          >
+            <Pencil size={16} />
+            Edit Inspection
+          </button>
+        </div>
+
+        {/* Planting Type */}
+        <div className="border-b border-slate-100 bg-blue-50 px-8 py-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-blue-600">
+                Planting Type
+              </p>
+
+              <h3 className="mt-1 text-lg font-semibold">
+                {visit.planting_type === "TM"
+                  ? "🌴 Tanaman Menghasilkan (TM)"
+                  : "🌱 Tanaman Belum Menghasilkan (TBM)"}
+              </h3>
+            </div>
+
+            <span className="rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white">
+              {visit.planting_type}
+            </span>
           </div>
         </div>
-      </div>
 
-      <div className="space-y-6 p-8">
-        {sections.map((section) => {
-          const Icon = section.icon;
+        {/* Section */}
+        <div className="space-y-8 p-8">
+          {visibleSections.map((section) => {
+            const Icon = section.icon;
 
-          const scores = section.items.map(
-            ([, key]) => Number((visit as any)[key]) || 0,
-          );
+            const values = section.items
+              .map(([, key]) => Number((visit as any)[key]))
+              .filter((v) => v > 0);
 
-          const average = scores.reduce((a, b) => a + b, 0) / scores.length;
-
-          return (
-            <div
-              key={section.title}
-              className="rounded-2xl border border-slate-200"
-            >
-              {/* Category Header */}
-              <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50 px-6 py-4">
-                <div className="flex items-center gap-3">
-                  <div className="rounded-lg bg-blue-100 p-2">
-                    <Icon size={18} className="text-blue-600" />
-                  </div>
-
-                  <div>
-                    <h3 className="font-semibold text-slate-900">
-                      {section.title}
-                    </h3>
-
-                    <p className="text-xs text-slate-500">
-                      {section.items.length} Items
-                    </p>
-                  </div>
-                </div>
-
-                <div className="rounded-xl bg-blue-50 px-4 py-2 text-center">
-                  <p className="text-lg font-bold text-blue-600">
-                    {Math.round(average)}%
-                  </p>
-
-                  <p className="text-[10px] uppercase tracking-wide text-slate-500">
-                    Average
-                  </p>
-                </div>
-              </div>
-
-              {/* Items */}
-              <div className="grid gap-x-8 gap-y-4 p-6 md:grid-cols-2 xl:grid-cols-3">
-                {section.items.map(([label, key]) => {
-                  const score = Number((visit as any)[key]) || 0;
-
-                  const badge = getBadge(score);
-
-                  return (
-                    <div
-                      key={key}
-                      className="flex items-center justify-between border-b border-dashed border-slate-200 pb-3 last:border-0"
-                    >
-                      <div>
-                        <p className="text-sm font-medium text-slate-700">
-                          {label}
-                        </p>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold text-blue-600">
-                          {score}%
-                        </span>
-
-                        <span
-                          className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${badge.className}`}
-                        >
-                          {badge.label}
-                        </span>
-                      </div>
-                    </div>
+            const average =
+              values.length === 0
+                ? "-"
+                : (values.reduce((a, b) => a + b, 0) / values.length).toFixed(
+                    1,
                   );
-                })}
+
+            return (
+              <div key={section.title}>
+                <div className="mb-3 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Icon className="text-blue-600" size={18} />
+
+                    <div>
+                      <h3 className="font-semibold">{section.title}</h3>
+
+                      <p className="text-xs text-slate-500">
+                        {values.length}/{section.items.length} indikator
+                      </p>
+                    </div>
+                  </div>
+
+                  <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold">
+                    Avg {average}
+                  </span>
+                </div>
+
+                <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+                  {section.items.map(([label, key]) => {
+                    const score = Number((visit as any)[key]) || null;
+
+                    const badge = getBadge(score);
+
+                    return (
+                      <div
+                        key={key}
+                        className="flex items-center justify-between rounded-lg border border-slate-200 px-4 py-3"
+                      >
+                        <span className="text-sm text-slate-700">{label}</span>
+
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold">{score ?? "-"}</span>
+
+                          <span
+                            className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${badge.className}`}
+                          >
+                            {badge.label}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
-    </section>
+            );
+          })}
+        </div>
+        {open && (
+          <EditInspectionModal
+            visit={visit}
+            onClose={() => setOpen(false)}
+            onSuccess={() => window.location.reload()}
+          />
+        )}
+      </section>
+    </>
   );
 }

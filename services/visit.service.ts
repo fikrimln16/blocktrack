@@ -67,7 +67,6 @@ export async function getBlockVisits(blockId: number): Promise<Visit[]> {
 
 interface VisitPayload {
   user_id: number;
-
   block_id: number;
 
   visit_date: string;
@@ -78,32 +77,53 @@ interface VisitPayload {
 
   latitude: number;
   longitude: number;
-  accuracy?: number;
+  accuracy?: number | null;
 
-  plant_population?: number | null;
-  plant_infill?: number | null;
-  termite?: number | null;
-  orcytes?: number | null;
-  pest?: number | null;
-  leaf_caterpillar?: number | null;
+  planting_type: "TM" | "TBM";
+
+  // ==========================
+  // TM
+  // ==========================
+  produksi?: number | null;
+  kuantitas_sisipan_3_5_tahun?: number | null;
+  ganoderma?: number | null;
+  pasar_panen?: number | null;
+  tunas_pokok?: number | null;
+  nomor_dan_kebersihan_tph?: number | null;
+  titi_panen?: number | null;
+  pencurian?: number | null;
+
+  // ==========================
+  // TBM
+  // ==========================
+  kuantitas_sisipan?: number | null;
+  pasar_rintis?: number | null;
+  tph?: number | null;
+  sanitasi_kastrasi?: number | null;
+  perawatan_kacangan?: number | null;
+  titi_rintis?: number | null;
+
+  // ==========================
+  // TM & TBM
+  // ==========================
+  populasi_pokok?: number | null;
+  rayap?: number | null;
+  hama_oryctes?: number | null;
+  tikus_babi_other_pest?: number | null;
+  ulat_pemakan_daun?: number | null;
   beneficial_weed?: number | null;
 
-  circle_condition?: number | null;
-  harvesting_path?: number | null;
-  interrow?: number | null;
-  tph_condition?: number | null;
-  sanitation?: number | null;
-  cover_crop?: number | null;
+  piringan?: number | null;
+  gawangan_mineral_gambut?: number | null;
 
-  road_condition?: number | null;
-  bridge_condition?: number | null;
-  footbridge_condition?: number | null;
+  jalan?: number | null;
+  jembatan?: number | null;
 
-  drainage_condition?: number | null;
-  ditch_condition?: number | null;
-  monitoring_well?: number | null;
+  kondisi_drainase_blok?: number | null;
+  parit?: number | null;
+  sumur_pantau?: number | null;
 
-  fertilizing?: number | null;
+  pemupukan?: number | null;
 
   notes: string;
 }
@@ -250,6 +270,125 @@ export async function deleteVisitService(visitId: number): Promise<void> {
     await connection.commit();
   } catch (error) {
     await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
+}
+
+import {
+  updateVisitInspection,
+  UpdateVisitInspectionPayload,
+} from "@/repositories/visit.repository";
+
+export async function updateInspection(
+  visitId: number,
+  payload: UpdateVisitInspectionPayload,
+): Promise<void> {
+  const connection = await db.getConnection();
+
+  try {
+    await connection.beginTransaction();
+
+    await updateVisitInspection(connection, visitId, payload);
+
+    await connection.commit();
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
+}
+
+export async function uploadVisitPhotos(
+  visitId: number,
+  photos: File[],
+): Promise<void> {
+  const connection = await db.getConnection();
+
+  const uploadDir = path.join(process.cwd(), "storage", "uploads", "photos");
+
+  const uploadedFiles: string[] = [];
+
+  try {
+    await connection.beginTransaction();
+
+    await fs.mkdir(uploadDir, {
+      recursive: true,
+    });
+
+    for (const photo of photos) {
+      if (!(photo instanceof File)) continue;
+
+      if (photo.size === 0) continue;
+
+      if (!photo.type.startsWith("image/")) continue;
+
+      const bytes = await photo.arrayBuffer();
+
+      const buffer = Buffer.from(bytes);
+
+      let ext = path.extname(photo.name).toLowerCase();
+
+      if (!ext) {
+        switch (photo.type) {
+          case "image/png":
+            ext = ".png";
+            break;
+
+          case "image/webp":
+            ext = ".webp";
+            break;
+
+          case "image/heic":
+            ext = ".heic";
+            break;
+
+          case "image/heif":
+            ext = ".heif";
+            break;
+
+          default:
+            ext = ".jpg";
+        }
+      }
+
+      const now = new Date();
+
+      const timestamp =
+        `${now.getFullYear()}` +
+        `${String(now.getMonth() + 1).padStart(2, "0")}` +
+        `${String(now.getDate()).padStart(2, "0")}_` +
+        `${String(now.getHours()).padStart(2, "0")}` +
+        `${String(now.getMinutes()).padStart(2, "0")}` +
+        `${String(now.getSeconds()).padStart(2, "0")}`;
+
+      const random = crypto.randomBytes(6).toString("hex");
+
+      const fileName = `visit_${timestamp}_${random}${ext}`;
+
+      await fs.writeFile(path.join(uploadDir, fileName), buffer);
+
+      uploadedFiles.push(fileName);
+
+      await createVisitPhoto(connection, visitId, fileName);
+    }
+
+    await connection.commit();
+  } catch (error) {
+    await connection.rollback();
+
+    await Promise.all(
+      uploadedFiles.map(async (file) => {
+        try {
+          await fs.unlink(path.join(uploadDir, file));
+        } catch {
+          // ignore
+        }
+      }),
+    );
+
     throw error;
   } finally {
     connection.release();

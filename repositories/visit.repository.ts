@@ -14,35 +14,45 @@ export interface CreateVisitPayload {
   longitude: number;
   accuracy?: number | null;
 
-  // Plant Condition
-  plant_population?: number | null;
-  plant_infill?: number | null;
-  termite?: number | null;
-  orcytes?: number | null;
-  pest?: number | null;
-  leaf_caterpillar?: number | null;
+  planting_type: "TM" | "TBM";
+
+  // ===== TM =====
+  produksi?: number | null;
+  kuantitas_sisipan_3_5_tahun?: number | null;
+  ganoderma?: number | null;
+  pasar_panen?: number | null;
+  tunas_pokok?: number | null;
+  nomor_dan_kebersihan_tph?: number | null;
+  titi_panen?: number | null;
+  pencurian?: number | null;
+
+  // ===== TBM =====
+  kuantitas_sisipan?: number | null;
+  pasar_rintis?: number | null;
+  tph?: number | null;
+  sanitasi_kastrasi?: number | null;
+  perawatan_kacangan?: number | null;
+  titi_rintis?: number | null;
+
+  // ===== Dipakai TM & TBM =====
+  populasi_pokok?: number | null;
+  rayap?: number | null;
+  hama_oryctes?: number | null;
+  tikus_babi_other_pest?: number | null;
+  ulat_pemakan_daun?: number | null;
   beneficial_weed?: number | null;
 
-  // Field Condition
-  circle_condition?: number | null;
-  harvesting_path?: number | null;
-  interrow?: number | null;
-  tph_condition?: number | null;
-  sanitation?: number | null;
-  cover_crop?: number | null;
+  piringan?: number | null;
+  gawangan_mineral_gambut?: number | null;
 
-  // Infrastructure
-  road_condition?: number | null;
-  bridge_condition?: number | null;
-  footbridge_condition?: number | null;
+  jalan?: number | null;
+  jembatan?: number | null;
 
-  // Environment
-  drainage_condition?: number | null;
-  ditch_condition?: number | null;
-  monitoring_well?: number | null;
+  kondisi_drainase_blok?: number | null;
+  parit?: number | null;
+  sumur_pantau?: number | null;
 
-  // Management
-  fertilizing?: number | null;
+  pemupukan?: number | null;
 
   notes: string;
 }
@@ -90,68 +100,80 @@ export async function createVisit(
 
   const [result] = await connection.execute<ResultSetHeader>(
     `
-    INSERT INTO visits
-    (
-      user_id,
-      block_id,
+  INSERT INTO visits
+  (
+    user_id,
+    block_id,
 
-      visit_date,
-      visit_time,
+    visit_date,
+    visit_time,
 
-      weather,
-      duration,
-      status,
+    weather,
+    duration,
+    status,
 
-      latitude,
-      longitude,
-      accuracy,
+    latitude,
+    longitude,
+    accuracy,
 
-      plant_population,
-      plant_infill,
-      termite,
-      orcytes,
-      pest,
-      leaf_caterpillar,
-      beneficial_weed,
+    planting_type,
 
-      circle_condition,
-      harvesting_path,
-      interrow,
-      tph_condition,
-      sanitation,
-      cover_crop,
+    produksi,
+    populasi_pokok,
+    kuantitas_sisipan,
+    kuantitas_sisipan_3_5_tahun,
+    ganoderma,
+    rayap,
+    hama_oryctes,
+    tikus_babi_other_pest,
+    ulat_pemakan_daun,
+    beneficial_weed,
 
-      road_condition,
-      bridge_condition,
-      footbridge_condition,
+    piringan,
+    pasar_panen,
+    pasar_rintis,
+    tunas_pokok,
+    gawangan_mineral_gambut,
+    tph,
+    sanitasi_kastrasi,
+    perawatan_kacangan,
+    nomor_dan_kebersihan_tph,
 
-      drainage_condition,
-      ditch_condition,
-      monitoring_well,
+    jalan,
+    jembatan,
+    titi_panen,
+    titi_rintis,
 
-      fertilizing,
+    kondisi_drainase_blok,
+    parit,
+    sumur_pantau,
 
-      notes
-    )
-    VALUES
-    (
-      ?, ?, ?, ?, ?, ?, ?,
+    pencurian,
+    pemupukan,
 
-      ?, ?, ?,
+    notes
+  )
+  VALUES
+  (
+    ?, ?, ?, ?, ?, ?, ?,
 
-      ?, ?, ?, ?, ?, ?, ?,
+    ?, ?, ?,
 
-      ?, ?, ?, ?, ?, ?,
+    ?,
 
-      ?, ?, ?,
+    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
 
-      ?, ?, ? ,
+    ?, ?, ?, ?, ?, ?, ?, ?, ?,
 
-      ?,
+    ?, ?, ?, ?,
 
-      ?
-    )
-    `,
+    ?, ?, ?,
+
+    ?, ?,
+
+    ?
+  )
+  `,
     [
       visit.user_id,
       visit.block_id,
@@ -162,41 +184,51 @@ export async function createVisit(
       visit.weather,
       visit.duration,
 
-      "Done", // Status otomatis
+      "Done",
 
       visit.latitude,
       visit.longitude,
       visit.accuracy ?? null,
 
-      // Plant
-      visit.plant_population ?? null,
-      visit.plant_infill ?? null,
-      visit.termite ?? null,
-      visit.orcytes ?? null,
-      visit.pest ?? null,
-      visit.leaf_caterpillar ?? null,
+      visit.planting_type,
+
+      // TM
+      visit.produksi ?? null,
+      visit.populasi_pokok ?? null,
+      visit.kuantitas_sisipan ?? null,
+      visit.kuantitas_sisipan_3_5_tahun ?? null,
+      visit.ganoderma ?? null,
+      visit.rayap ?? null,
+      visit.hama_oryctes ?? null,
+      visit.tikus_babi_other_pest ?? null,
+      visit.ulat_pemakan_daun ?? null,
       visit.beneficial_weed ?? null,
 
-      // Field
-      visit.circle_condition ?? null,
-      visit.harvesting_path ?? null,
-      visit.interrow ?? null,
-      visit.tph_condition ?? null,
-      visit.sanitation ?? null,
-      visit.cover_crop ?? null,
+      // Kondisi Kebun
+      visit.piringan ?? null,
+      visit.pasar_panen ?? null,
+      visit.pasar_rintis ?? null,
+      visit.tunas_pokok ?? null,
+      visit.gawangan_mineral_gambut ?? null,
+      visit.tph ?? null,
+      visit.sanitasi_kastrasi ?? null,
+      visit.perawatan_kacangan ?? null,
+      visit.nomor_dan_kebersihan_tph ?? null,
 
-      // Infrastructure
-      visit.road_condition ?? null,
-      visit.bridge_condition ?? null,
-      visit.footbridge_condition ?? null,
+      // Infrastruktur
+      visit.jalan ?? null,
+      visit.jembatan ?? null,
+      visit.titi_panen ?? null,
+      visit.titi_rintis ?? null,
 
-      // Environment
-      visit.drainage_condition ?? null,
-      visit.ditch_condition ?? null,
-      visit.monitoring_well ?? null,
+      // Drainase
+      visit.kondisi_drainase_blok ?? null,
+      visit.parit ?? null,
+      visit.sumur_pantau ?? null,
 
       // Management
-      visit.fertilizing ?? null,
+      visit.pencurian ?? null,
+      visit.pemupukan ?? null,
 
       visit.notes,
     ],
@@ -337,5 +369,133 @@ export async function deleteVisit(
         ),
       ),
     ),
+  );
+}
+export interface UpdateVisitInspectionPayload {
+  planting_type: "TM" | "TBM";
+
+  // Kondisi Tanaman
+  produksi?: number | null;
+  populasi_pokok?: number | null;
+  kuantitas_sisipan?: number | null;
+  kuantitas_sisipan_3_5_tahun?: number | null;
+  ganoderma?: number | null;
+  rayap?: number | null;
+  hama_oryctes?: number | null;
+  tikus_babi_other_pest?: number | null;
+  ulat_pemakan_daun?: number | null;
+  beneficial_weed?: number | null;
+
+  // Kondisi Kebun
+  piringan?: number | null;
+  pasar_panen?: number | null;
+  pasar_rintis?: number | null;
+  tunas_pokok?: number | null;
+  gawangan_mineral_gambut?: number | null;
+  tph?: number | null;
+  sanitasi_kastrasi?: number | null;
+  perawatan_kacangan?: number | null;
+  nomor_dan_kebersihan_tph?: number | null;
+
+  // Infrastruktur
+  jalan?: number | null;
+  jembatan?: number | null;
+  titi_panen?: number | null;
+  titi_rintis?: number | null;
+
+  // Drainase
+  kondisi_drainase_blok?: number | null;
+  parit?: number | null;
+  sumur_pantau?: number | null;
+
+  // Manajemen
+  pencurian?: number | null;
+  pemupukan?: number | null;
+}
+
+export async function updateVisitInspection(
+  connection: PoolConnection,
+  visitId: number,
+  payload: UpdateVisitInspectionPayload,
+): Promise<void> {
+  await connection.execute<ResultSetHeader>(
+    `
+    UPDATE visits
+    SET
+      planting_type = ?,
+
+      produksi = ?,
+      populasi_pokok = ?,
+      kuantitas_sisipan = ?,
+      kuantitas_sisipan_3_5_tahun = ?,
+      ganoderma = ?,
+      rayap = ?,
+      hama_oryctes = ?,
+      tikus_babi_other_pest = ?,
+      ulat_pemakan_daun = ?,
+      beneficial_weed = ?,
+
+      piringan = ?,
+      pasar_panen = ?,
+      pasar_rintis = ?,
+      tunas_pokok = ?,
+      gawangan_mineral_gambut = ?,
+      tph = ?,
+      sanitasi_kastrasi = ?,
+      perawatan_kacangan = ?,
+      nomor_dan_kebersihan_tph = ?,
+
+      jalan = ?,
+      jembatan = ?,
+      titi_panen = ?,
+      titi_rintis = ?,
+
+      kondisi_drainase_blok = ?,
+      parit = ?,
+      sumur_pantau = ?,
+
+      pencurian = ?,
+      pemupukan = ?
+
+    WHERE id = ?
+    `,
+    [
+      payload.planting_type,
+
+      payload.produksi ?? null,
+      payload.populasi_pokok ?? null,
+      payload.kuantitas_sisipan ?? null,
+      payload.kuantitas_sisipan_3_5_tahun ?? null,
+      payload.ganoderma ?? null,
+      payload.rayap ?? null,
+      payload.hama_oryctes ?? null,
+      payload.tikus_babi_other_pest ?? null,
+      payload.ulat_pemakan_daun ?? null,
+      payload.beneficial_weed ?? null,
+
+      payload.piringan ?? null,
+      payload.pasar_panen ?? null,
+      payload.pasar_rintis ?? null,
+      payload.tunas_pokok ?? null,
+      payload.gawangan_mineral_gambut ?? null,
+      payload.tph ?? null,
+      payload.sanitasi_kastrasi ?? null,
+      payload.perawatan_kacangan ?? null,
+      payload.nomor_dan_kebersihan_tph ?? null,
+
+      payload.jalan ?? null,
+      payload.jembatan ?? null,
+      payload.titi_panen ?? null,
+      payload.titi_rintis ?? null,
+
+      payload.kondisi_drainase_blok ?? null,
+      payload.parit ?? null,
+      payload.sumur_pantau ?? null,
+
+      payload.pencurian ?? null,
+      payload.pemupukan ?? null,
+
+      visitId,
+    ],
   );
 }

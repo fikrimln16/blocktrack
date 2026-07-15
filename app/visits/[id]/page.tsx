@@ -9,6 +9,7 @@ import { VisitMap } from "@/components/visit-detail/visit-map";
 import { VisitDocumentation } from "@/components/visit-detail/documentation/visit-documentation";
 import { VisitAttachments } from "@/components/visit-detail/attachments/visit-attachments";
 import { VisitInspection } from "@/components/visit-detail/visit-inspection";
+import { VisitNotes } from "@/components/visit-detail/visit-notes";
 
 import { findVisitDetail } from "@/services/visit-detail.service";
 import { VisitMapWrapper } from "@/components/visit-detail/visit-map-wrapper";
@@ -28,7 +29,7 @@ export default async function VisitDetailPage({ params }: Props) {
       <div className="space-y-6">
         <VisitHeader visit={visit} />
 
-        <VisitSummary visit={visit} />
+        {/* <VisitSummary visit={visit} /> */}
 
         <div className="grid items-stretch gap-6 xl:grid-cols-12">
           <div className="xl:col-span-4">
@@ -56,10 +57,10 @@ export default async function VisitDetailPage({ params }: Props) {
 
         <div className="space-y-8">
           <VisitInspection visit={visit} />
-
+          <VisitNotes visit={visit} />
           <VisitDocumentation visit={visit} />
 
-          <VisitAttachments visit={visit} />
+          {/* <VisitAttachments visit={visit} /> */}
         </div>
       </div>
     </DashboardLayout>
