@@ -53,11 +53,15 @@ const TM_SECTIONS = [
     ],
   },
   {
-    title: "👷 Manajemen Kebun",
+    title: "🤝 Kondisi Sosial",
     fields: [
       ["pencurian", "Pencurian"],
-      ["pemupukan", "Pemupukan"],
+      ["klaim_lahan", "Klaim Lahan"],
     ],
+  },
+  {
+    title: "📋 Manajemen Kebun",
+    fields: [["pemupukan", "Pemupukan"]],
   },
 ];
 

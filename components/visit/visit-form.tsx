@@ -132,6 +132,9 @@ export function VisitForm({ block, users }: Props) {
         pencurian:
           data.planting_type === "TM" ? (data.pencurian ?? null) : null,
 
+        klaim_lahan:
+          data.planting_type === "TM" ? (data.klaim_lahan ?? null) : null,
+
         // ===========================
         // TBM
         // ===========================

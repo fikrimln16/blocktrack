@@ -140,10 +140,14 @@ export interface VisitDetail {
   sumur_pantau: number | null;
 
   // ===========================
+  // Kondisi Sosial
+  // ===========================
+  pencurian: number | null;
+  klaim_lahan: number | null;
+
+  // ===========================
   // Manajemen
   // ===========================
-
-  pencurian: number | null;
   pemupukan: number | null;
 
   created_at: string;
@@ -223,6 +227,8 @@ export interface VisitRow extends RowDataPacket {
   sumur_pantau: number | null;
 
   pencurian: number | null;
+  klaim_lahan: number | null;
+
   pemupukan: number | null;
 
   created_at: string;

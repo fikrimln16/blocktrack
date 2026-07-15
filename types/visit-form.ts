@@ -97,6 +97,7 @@ export interface VisitFormValues {
   // ===========================
 
   pencurian?: number;
+  klaim_lahan?: number;
 
   // ===========================
   // F. Pemeliharaan

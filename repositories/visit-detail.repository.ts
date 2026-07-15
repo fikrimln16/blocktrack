@@ -65,8 +65,11 @@ export async function getVisitDetail(id: number): Promise<VisitDetail> {
       v.parit,
       v.sumur_pantau,
 
-      -- Manajemen
+      -- Kondisi Sosial
       v.pencurian,
+      v.klaim_lahan,
+
+      -- Manajemen
       v.pemupukan,
 
       v.created_at,

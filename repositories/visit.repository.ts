@@ -25,6 +25,7 @@ export interface CreateVisitPayload {
   nomor_dan_kebersihan_tph?: number | null;
   titi_panen?: number | null;
   pencurian?: number | null;
+  klaim_lahan?: number | null;
 
   // ===== TBM =====
   kuantitas_sisipan?: number | null;
@@ -149,6 +150,7 @@ export async function createVisit(
     sumur_pantau,
 
     pencurian,
+    klaim_lahan,
     pemupukan,
 
     notes
@@ -169,7 +171,7 @@ export async function createVisit(
 
     ?, ?, ?,
 
-    ?, ?,
+    ?, ?, ?,
 
     ?
   )
@@ -226,8 +228,11 @@ export async function createVisit(
       visit.parit ?? null,
       visit.sumur_pantau ?? null,
 
-      // Management
+      // Kondisi Sosial
       visit.pencurian ?? null,
+      visit.klaim_lahan ?? null,
+
+      // Management
       visit.pemupukan ?? null,
 
       visit.notes,
@@ -408,8 +413,11 @@ export interface UpdateVisitInspectionPayload {
   parit?: number | null;
   sumur_pantau?: number | null;
 
-  // Manajemen
+  // Kondisi Sosial
   pencurian?: number | null;
+  klaim_lahan?: number | null;
+
+  // Manajemen
   pemupukan?: number | null;
 }
 
@@ -455,6 +463,8 @@ export async function updateVisitInspection(
       sumur_pantau = ?,
 
       pencurian = ?,
+      klaim_lahan = ?,
+
       pemupukan = ?
 
     WHERE id = ?
@@ -493,6 +503,8 @@ export async function updateVisitInspection(
       payload.sumur_pantau ?? null,
 
       payload.pencurian ?? null,
+      payload.klaim_lahan ?? null,
+
       payload.pemupukan ?? null,
 
       visitId,

@@ -74,7 +74,10 @@ const sections = [
   {
     title: "Kondisi Sosial",
     icon: ShieldAlert,
-    items: [["Pencurian", "pencurian"]],
+    items: [
+      ["Pencurian", "pencurian"],
+      ["Klaim Lahan", "klaim_lahan"],
+    ],
   },
   {
     title: "Manajemen Kebun",
