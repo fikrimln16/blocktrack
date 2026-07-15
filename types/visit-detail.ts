@@ -13,6 +13,52 @@ export interface VisitPhoto {
   created_at: string;
 }
 
+export interface Inspection {
+  planting_type: "TM" | "TBM";
+
+  plant: {
+    produksi: number | null;
+    populasi_pokok: number | null;
+    kuantitas_sisipan: number | null;
+    kuantitas_sisipan_3_5_tahun: number | null;
+    ganoderma: number | null;
+    rayap: number | null;
+    hama_oryctes: number | null;
+    tikus_babi_other_pest: number | null;
+    ulat_pemakan_daun: number | null;
+    beneficial_weed: number | null;
+  };
+
+  field: {
+    piringan: number | null;
+    pasar_panen: number | null;
+    pasar_rintis: number | null;
+    tunas_pokok: number | null;
+    gawangan_mineral_gambut: number | null;
+    nomor_dan_kebersihan_tph: number | null;
+    tph: number | null;
+    sanitasi_kastrasi: number | null;
+    perawatan_kacangan: number | null;
+  };
+
+  infrastructure: {
+    jalan: number | null;
+    jembatan: number | null;
+    titi_panen: number | null;
+    titi_rintis: number | null;
+  };
+
+  drainage: {
+    kondisi_drainase_blok: number | null;
+    parit: number | null;
+    sumur_pantau: number | null;
+  };
+
+  management: {
+    pencurian: number | null;
+    pemupukan: number | null;
+  };
+}
 export interface VisitDetail {
   id: number;
 
@@ -22,9 +68,9 @@ export interface VisitDetail {
   inspector: string;
   role: string;
 
-  photo?: string;
-  email?: string;
-  phone?: string;
+  photo: string | null;
+  email: string | null;
+  phone: string | null;
 
   total_visits: number;
 
@@ -47,7 +93,6 @@ export interface VisitDetail {
   status: string;
 
   planting_type: "TM" | "TBM";
-
   // ===========================
   // Kondisi Tanaman
   // ===========================
@@ -115,50 +160,9 @@ export interface VisitDetail {
  */
 export interface VisitRow extends RowDataPacket {
   id: number;
-
   visit_code: string;
-  visit_date: string;
-  visit_time: string;
-
-  status: string;
-  duration: number;
-  weather: string;
-  notes: string;
-
-  latitude: number;
-  longitude: number;
-  accuracy: number;
-
-  plant_population: number | null;
-  plant_infill: number | null;
-  termite: number | null;
-  orcytes: number | null;
-  pest: number | null;
-  leaf_caterpillar: number | null;
-  beneficial_weed: number | null;
-
-  circle_condition: number | null;
-  harvesting_path: number | null;
-  interrow: number | null;
-  tph_condition: number | null;
-  sanitation: number | null;
-  cover_crop: number | null;
-
-  road_condition: number | null;
-  bridge_condition: number | null;
-  footbridge_condition: number | null;
-
-  drainage_condition: number | null;
-  ditch_condition: number | null;
-  monitoring_well: number | null;
-
-  fertilizing: number | null;
-
-  created_at: string;
-  updated_at: string;
 
   user_id: number;
-
   inspector: string;
   role: string;
 
@@ -173,7 +177,58 @@ export interface VisitRow extends RowDataPacket {
   estate: string;
   ama: string;
 
-  polygon: string | GeoJsonPolygon | null;
+  latitude: number;
+  longitude: number;
+  accuracy: number;
+
+  weather: string;
+  notes: string;
+
+  visit_date: string;
+  visit_time: string;
+  duration: number;
+
+  status: string;
+
+  planting_type: "TM" | "TBM";
+
+  produksi: number | null;
+  populasi_pokok: number | null;
+  kuantitas_sisipan: number | null;
+  kuantitas_sisipan_3_5_tahun: number | null;
+  ganoderma: number | null;
+  rayap: number | null;
+  hama_oryctes: number | null;
+  tikus_babi_other_pest: number | null;
+  ulat_pemakan_daun: number | null;
+  beneficial_weed: number | null;
+
+  piringan: number | null;
+  pasar_panen: number | null;
+  pasar_rintis: number | null;
+  tunas_pokok: number | null;
+  gawangan_mineral_gambut: number | null;
+  tph: number | null;
+  sanitasi_kastrasi: number | null;
+  perawatan_kacangan: number | null;
+  nomor_dan_kebersihan_tph: number | null;
+
+  jalan: number | null;
+  jembatan: number | null;
+  titi_panen: number | null;
+  titi_rintis: number | null;
+
+  kondisi_drainase_blok: number | null;
+  parit: number | null;
+  sumur_pantau: number | null;
+
+  pencurian: number | null;
+  pemupukan: number | null;
+
+  created_at: string;
+  updated_at: string;
+
+  polygon: string | null;
 }
 
 /**

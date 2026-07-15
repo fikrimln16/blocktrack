@@ -195,59 +195,8 @@ export async function getVisitDetail(id: number): Promise<VisitDetail> {
     polygon = null;
   }
 
-  const inspection = {
-    planting_type: visit.planting_type,
-
-    plant: {
-      produksi: visit.produksi,
-      populasi_pokok: visit.populasi_pokok,
-      kuantitas_sisipan: visit.kuantitas_sisipan,
-      kuantitas_sisipan_3_5_tahun: visit.kuantitas_sisipan_3_5_tahun,
-      ganoderma: visit.ganoderma,
-      rayap: visit.rayap,
-      hama_oryctes: visit.hama_oryctes,
-      tikus_babi_other_pest: visit.tikus_babi_other_pest,
-      ulat_pemakan_daun: visit.ulat_pemakan_daun,
-      beneficial_weed: visit.beneficial_weed,
-    },
-
-    field: {
-      piringan: visit.piringan,
-      pasar_panen: visit.pasar_panen,
-      pasar_rintis: visit.pasar_rintis,
-      tunas_pokok: visit.tunas_pokok,
-      gawangan_mineral_gambut: visit.gawangan_mineral_gambut,
-      nomor_dan_kebersihan_tph: visit.nomor_dan_kebersihan_tph,
-      tph: visit.tph,
-      sanitasi_kastrasi: visit.sanitasi_kastrasi,
-      perawatan_kacangan: visit.perawatan_kacangan,
-    },
-
-    infrastructure: {
-      jalan: visit.jalan,
-      jembatan: visit.jembatan,
-      titi_panen: visit.titi_panen,
-      titi_rintis: visit.titi_rintis,
-    },
-
-    drainage: {
-      kondisi_drainase_blok: visit.kondisi_drainase_blok,
-      parit: visit.parit,
-      sumur_pantau: visit.sumur_pantau,
-    },
-
-    management: {
-      pencurian: visit.pencurian,
-      pemupukan: visit.pemupukan,
-    },
-  };
-
   return {
     ...visit,
-
-    inspection,
-
-    planting_type: visit.planting_type,
 
     photo: visit.photo
       ? `/api/storage/uploads/photos/${visit.photo}`
