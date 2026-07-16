@@ -4,7 +4,7 @@ export const revalidate = 0;
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 
 import { DashboardSummary } from "@/components/dashboard/summary/dashboard-summary";
-import { RecentActivityFeed } from "@/components/dashboard/recent-activity/recent-activity";
+import { RecentActivityFeed } from "@/components/dashboard/recent-visits";
 import { RecentPhotosCard } from "@/components/dashboard/recent-photos-card";
 import { RecentNotesCard } from "@/components/dashboard/recent-notes-card";
 

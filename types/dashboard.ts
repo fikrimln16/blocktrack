@@ -42,15 +42,18 @@ export interface TopVisitor {
 export interface RecentActivity {
   id: number;
   visit_code: string;
-  visit_date: string;
-
-  inspector: string;
   role: string;
   photo: string;
+  inspector: string;
 
-  block_id: number;
-  block: string;
-
-  estate: string;
   ama: string;
+  estate: string;
+
+  block: string;
+  block_code: string;
+
+  visit_date: string;
+  visit_time: string;
+
+  status: string;
 }

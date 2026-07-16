@@ -1,17 +1,23 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, FileText, MapPin, User, CalendarDays } from "lucide-react";
+import { ArrowRight, CalendarDays, FileText, MapPin, User } from "lucide-react";
 
 interface RecentNote {
   id: number;
   visit_code: string;
   notes: string;
+
   visit_date: string;
   visit_time: string;
+
   inspector: string;
+  role: string;
+  photo: string;
+
   ama: string;
   estate: string;
+
   block: string;
   block_code: string;
 }
@@ -24,7 +30,7 @@ export function RecentNotesCard({ notes }: Props) {
   return (
     <section className="flex h-[420px] flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-slate-200 p-6">
+      <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
         <div className="flex items-center gap-4">
           <div className="rounded-2xl bg-amber-100 p-3">
             <FileText className="h-6 w-6 text-amber-600" />
@@ -51,9 +57,9 @@ export function RecentNotesCard({ notes }: Props) {
       </div>
 
       {/* Body */}
-      <div className="flex-1 overflow-y-auto divide-y divide-slate-100">
+      <div className="flex-1 divide-y divide-slate-100 overflow-y-auto">
         {notes.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16">
+          <div className="flex h-full flex-col items-center justify-center">
             <FileText className="mb-4 h-12 w-12 text-slate-300" />
 
             <h3 className="text-lg font-semibold text-slate-700">
@@ -68,11 +74,12 @@ export function RecentNotesCard({ notes }: Props) {
           notes.map((note) => (
             <div
               key={note.id}
-              className="group flex min-h-[150px] flex-col justify-between p-6 transition hover:bg-slate-50"
+              className="group p-6 transition hover:bg-slate-50"
             >
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                {/* Left */}
+              {/* Top */}
+              <div className="mb-4 flex items-start justify-between gap-4">
                 <div className="min-w-0 flex-1">
+                  {/* Visit Code + Date */}
                   <div className="mb-3 flex flex-wrap items-center gap-3">
                     <span className="rounded-lg bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600">
                       {note.visit_code}
@@ -84,60 +91,64 @@ export function RecentNotesCard({ notes }: Props) {
                     </div>
                   </div>
 
-                  <div className="mb-2 flex flex-wrap items-center gap-5">
-                    <div className="flex items-center gap-2 text-sm font-medium text-slate-700">
-                      <User size={15} />
+                  {/* Inspector */}
+                  <div className="mb-3 flex items-center gap-3">
+                    <img
+                      src={note.photo}
+                      alt={note.inspector}
+                      className="h-11 w-11 rounded-full border border-slate-200 object-cover shadow-sm"
+                    />
 
-                      {note.inspector}
-                    </div>
+                    <div>
+                      <p className="font-semibold leading-none text-slate-800">
+                        {note.inspector}
+                      </p>
 
-                    <div className="flex flex-wrap items-center gap-2 text-sm text-slate-500">
-                      <MapPin size={15} />
-
-                      <span>{note.ama}</span>
-
-                      <span>•</span>
-
-                      <span>{note.estate}</span>
-
-                      <span>•</span>
-
-                      <span>{note.block_code}</span>
-
-                      <span>({note.block})</span>
+                      <p className="mt-1 text-xs text-slate-500">{note.role}</p>
                     </div>
                   </div>
 
-                  <p className="line-clamp-3 leading-7 text-slate-600">
-                    {note.notes}
-                  </p>
+                  {/* Location */}
+                  <div className="flex flex-wrap items-center gap-2 text-sm text-slate-500">
+                    <MapPin size={15} />
+
+                    <span>{note.ama}</span>
+
+                    <span>•</span>
+
+                    <span>{note.estate}</span>
+
+                    <span>•</span>
+
+                    <span>{note.block_code}</span>
+
+                    <span>({note.block})</span>
+                  </div>
                 </div>
 
-                {/* Right */}
+                {/* Button */}
                 <Link
                   href={`/visits/${note.id}`}
-                  className="
-                    inline-flex
-                    items-center
-                    gap-2
-                    self-start
-                    rounded-xl
-                    border
-                    border-slate-200
-                    px-4
-                    py-2
-                    text-sm
-                    font-medium
-                    text-slate-700
-                    transition
-                    hover:border-blue-200
-                    hover:bg-blue-50
-                    hover:text-blue-600
-                  "
+                  className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
                 >
                   Detail
                   <ArrowRight size={16} />
                 </Link>
+              </div>
+
+              {/* Notes */}
+              <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
+                <div className="mb-2 flex items-center gap-2">
+                  <FileText size={16} className="text-amber-600" />
+
+                  <span className="text-sm font-semibold text-slate-700">
+                    Inspection Notes
+                  </span>
+                </div>
+
+                <p className="line-clamp-3 text-sm leading-7 text-slate-600">
+                  {note.notes}
+                </p>
               </div>
             </div>
           ))

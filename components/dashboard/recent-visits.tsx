@@ -5,29 +5,13 @@ import {
   Activity,
   ArrowRight,
   CalendarDays,
-  MapPin,
-  User,
   CheckCircle2,
   Clock3,
+  MapPin,
+  User,
 } from "lucide-react";
 
-interface RecentActivity {
-  id: number;
-  visit_code: string;
-
-  inspector: string;
-
-  ama: string;
-  estate: string;
-
-  block: string;
-  block_code: string;
-
-  visit_date: string;
-  visit_time: string;
-
-  status: string;
-}
+import type { RecentActivity } from "@/types/dashboard";
 
 interface Props {
   activities: RecentActivity[];
@@ -35,9 +19,10 @@ interface Props {
 
 export function RecentActivityFeed({ activities }: Props) {
   return (
-    <section className="flex h-[520px] flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+    <section className="flex h-[420px] flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-slate-200 p-6">
+      {/* Header */}
+      <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
         <div className="flex items-center gap-4">
           <div className="rounded-2xl bg-blue-100 p-3">
             <Activity className="h-6 w-6 text-blue-600" />
@@ -49,14 +34,28 @@ export function RecentActivityFeed({ activities }: Props) {
             </h2>
 
             <p className="mt-1 text-sm text-slate-500">
-              Latest inspection activities.
+              Latest field inspection activities submitted by inspectors.
             </p>
           </div>
         </div>
 
         <Link
           href="/visits"
-          className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+          className="
+            inline-flex
+            items-center
+            gap-2
+            rounded-xl
+            border
+            border-slate-200
+            px-4
+            py-2
+            text-sm
+            font-medium
+            text-slate-700
+            transition
+            hover:bg-slate-50
+          "
         >
           View All
           <ArrowRight size={16} />
@@ -64,7 +63,7 @@ export function RecentActivityFeed({ activities }: Props) {
       </div>
 
       {/* Body */}
-      <div className="flex-1 overflow-y-auto divide-y divide-slate-100">
+      <div className="flex-1 divide-y divide-slate-100 overflow-y-auto">
         {activities.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center">
             <Activity className="mb-4 h-12 w-12 text-slate-300" />
@@ -74,50 +73,59 @@ export function RecentActivityFeed({ activities }: Props) {
             </h3>
 
             <p className="mt-2 text-sm text-slate-500">
-              No recent inspections.
+              No inspection activity available.
             </p>
           </div>
         ) : (
           activities.map((activity) => (
             <div
               key={activity.id}
-              className="group flex min-h-[150px] flex-col justify-between p-6 transition hover:bg-slate-50"
+              className="group p-6 transition hover:bg-slate-50"
             >
-              <div>
-                <div className="mb-3 flex flex-wrap items-center gap-3">
-                  <span className="rounded-lg bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600">
-                    {activity.visit_code}
-                  </span>
+              {/* Header */}
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0 flex-1">
+                  {/* Visit */}
+                  <div className="mb-3 flex flex-wrap items-center gap-3">
+                    <span className="rounded-lg bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600">
+                      {activity.visit_code}
+                    </span>
 
-                  <div className="flex items-center gap-1 text-sm text-slate-500">
-                    <CalendarDays size={14} />
-                    {activity.visit_date} • {activity.visit_time}
+                    <div className="flex items-center gap-1 text-sm text-slate-500">
+                      <CalendarDays size={14} />
+                      {activity.visit_date} • {activity.visit_time}
+                    </div>
+
+                    <span
+                      className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium ${
+                        activity.status === "Completed"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-amber-100 text-amber-700"
+                      }`}
+                    >
+                      {activity.status}
+                    </span>
                   </div>
 
-                  <span
-                    className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium ${
-                      activity.status === "Completed"
-                        ? "bg-green-100 text-green-700"
-                        : "bg-amber-100 text-amber-700"
-                    }`}
-                  >
-                    {activity.status === "Completed" ? (
-                      <CheckCircle2 size={13} />
-                    ) : (
-                      <Clock3 size={13} />
-                    )}
+                  {/* Inspector */}
+                  {/* Inspector */}
+                  <div className="mb-3 flex items-center gap-3">
+                    <img
+                      src={activity.photo}
+                      alt={activity.inspector}
+                      className="h-11 w-11 rounded-full border border-slate-200 object-cover"
+                    />
 
-                    {activity.status}
-                  </span>
-                </div>
+                    <div>
+                      <p className="font-semibold text-slate-800">
+                        {activity.inspector}
+                      </p>
 
-                <div className="mb-2 flex flex-wrap items-center gap-5">
-                  <div className="flex items-center gap-2 text-sm font-medium text-slate-700">
-                    <User size={15} />
-
-                    {activity.inspector}
+                      <p className="text-xs text-slate-500">{activity.role}</p>
+                    </div>
                   </div>
 
+                  {/* Location */}
                   <div className="flex flex-wrap items-center gap-2 text-sm text-slate-500">
                     <MapPin size={15} />
 
@@ -130,21 +138,28 @@ export function RecentActivityFeed({ activities }: Props) {
                     <span>•</span>
 
                     <span>{activity.block_code}</span>
-
-                    <span>({activity.block})</span>
                   </div>
                 </div>
 
-                <p className="line-clamp-2 text-sm leading-6 text-slate-600">
-                  Inspection activity has been completed and recorded for this
-                  block.
-                </p>
-              </div>
-
-              <div className="mt-4">
                 <Link
                   href={`/visits/${activity.id}`}
-                  className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
+                  className="
+                  inline-flex
+                  items-center
+                  gap-2
+                  rounded-xl
+                  border
+                  border-slate-200
+                  px-4
+                  py-2
+                  text-sm
+                  font-medium
+                  text-slate-700
+                  transition
+                  hover:border-blue-200
+                  hover:bg-blue-50
+                  hover:text-blue-600
+                "
                 >
                   Detail
                   <ArrowRight size={16} />

@@ -122,37 +122,42 @@ export async function getRecentActivitiesRepository(): Promise<
   const [rows] = await db.query<RowDataPacket[]>(
     `
     SELECT
-        v.id,
-        v.visit_code,
-        v.visit_date,
+    v.id,
+    v.visit_code,
 
-        u.name AS inspector,
-        u.role,
-        u.photo,
+    DATE_FORMAT(v.visit_date, '%d %b %Y') AS visit_date,
+    TIME_FORMAT(v.visit_time, '%H:%i') AS visit_time,
 
-        b.block_name AS block,
-        b.id AS block_id,
-        e.name AS estate,
-        a.name AS ama
+    COALESCE(v.status, 'Completed') AS status,
 
-    FROM visits v
+    u.name AS inspector,
+    u.role,
+    u.photo,
 
-    INNER JOIN users u
-        ON u.id = v.user_id
+    b.block_name AS block,
+    b.block_code,
+    b.id AS block_id,
 
-    INNER JOIN blocks b
-        ON b.id = v.block_id
+    e.name AS estate,
+    a.name AS ama
 
-    INNER JOIN estates e
-        ON e.id = b.estate_id
+FROM visits v
 
-    INNER JOIN amas a
-        ON a.id = e.ama_id
+INNER JOIN users u
+    ON u.id = v.user_id
 
-    ORDER BY
-        v.created_at DESC
+INNER JOIN blocks b
+    ON b.id = v.block_id
 
-    LIMIT 6
+INNER JOIN estates e
+    ON e.id = b.estate_id
+
+INNER JOIN amas a
+    ON a.id = e.ama_id
+
+ORDER BY v.created_at DESC
+
+LIMIT 6
     `,
   );
 
