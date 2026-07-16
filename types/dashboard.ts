@@ -68,3 +68,17 @@ export interface NeedAttention {
 
   priority_score: number;
 }
+
+export interface AmaNeedAttention {
+  amaId: number;
+  ama: string;
+
+  totalEstates: number;
+  totalVisits: number;
+
+  poor: number;
+  warning: number;
+  good: number;
+
+  priorityScore: number;
+}

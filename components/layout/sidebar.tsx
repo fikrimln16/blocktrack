@@ -18,6 +18,7 @@ import {
   X,
   Headset,
   Palmtree,
+  ShieldAlert,
 } from "lucide-react";
 
 const menus = [
@@ -61,11 +62,11 @@ const menus = [
     href: "/attachments",
     icon: FileText,
   },
-  // {
-  //   title: "Analytics",
-  //   href: "/analytics",
-  //   icon: BarChart3,
-  // },
+  {
+    title: "Attention",
+    href: "/attention",
+    icon: ShieldAlert,
+  },
 ];
 
 export function Sidebar() {

@@ -3,7 +3,9 @@ import {
   getDashboardStatisticsRepository,
   getTopVisitorsRepository,
   getRecentActivitiesRepository,
+  getNeedAttentionByAmaRepository,
 } from "@/repositories/dashboard.repository";
+
 import { getRecentPhotos } from "@/repositories/dashboard-recent-photos.repository";
 import { getRecentNotes } from "@/repositories/dashboard-recent-notes.repository";
 import { getNeedAttentionRepository } from "@/repositories/dashboard-need-attention.repository";
@@ -34,4 +36,8 @@ export async function getDashboardRecentNotes() {
 
 export async function getNeedAttention() {
   return await getNeedAttentionRepository();
+}
+
+export async function getNeedAttentionByAma() {
+  return await getNeedAttentionByAmaRepository();
 }

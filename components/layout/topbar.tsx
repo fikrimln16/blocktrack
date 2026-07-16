@@ -75,9 +75,9 @@ function getPageInfo(pathname: string) {
     };
   }
 
-  if (pathname === "/blocks") {
+  if (pathname === "/attention") {
     return {
-      title: "Block Management",
+      title: "Attention Management",
       description: "Monitor plantation blocks",
     };
   }

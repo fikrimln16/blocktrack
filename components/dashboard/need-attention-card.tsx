@@ -6,6 +6,7 @@ import {
   ArrowRight,
   ShieldAlert,
   CircleAlert,
+  CheckCircle2,
 } from "lucide-react";
 
 import type { NeedAttention } from "@/types/dashboard";
@@ -27,58 +28,64 @@ export function NeedAttentionCard({ items }: Props) {
           </div>
 
           <div>
-            <h2 className="text-xl font-semibold text-slate-900">
+            <h2 className="text-lg font-semibold text-slate-900">
               Need Attention
             </h2>
 
             <p className="mt-1 text-sm text-slate-500">
-              Highest priority inspection findings.
+              Inspection categories requiring immediate attention.
             </p>
           </div>
         </div>
 
         <Link
-          href="/reports"
-          className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+          href="/dashboard/attention"
+          className="inline-flex items-center gap-1 text-sm font-medium text-slate-600 transition hover:text-slate-900"
         >
           View All
-          <ArrowRight size={16} />
+          <ArrowRight size={15} />
         </Link>
       </div>
 
-      {/* Body */}
-      <div className="flex-1 divide-y divide-slate-100 overflow-y-auto">
-        {items.map((item) => {
+      {/* List */}
+      <div className="flex-1 overflow-y-auto">
+        {items.map((item, index) => {
           const percentage = (item.priority_score / maxScore) * 100;
 
           return (
             <div
               key={item.category}
-              className="p-6 transition hover:bg-slate-50"
+              className="border-b border-slate-100 px-6 py-5 transition-colors last:border-none hover:bg-slate-50"
             >
-              {/* Title */}
-              <div className="mb-3 flex items-center justify-between">
-                <div>
-                  <h3 className="font-semibold text-slate-800">
-                    {item.category}
-                  </h3>
+              {/* Top */}
+              <div className="mb-3 flex items-start justify-between">
+                <div className="flex items-start gap-4">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-50 text-sm font-bold text-red-600">
+                    #{index + 1}
+                  </div>
 
-                  <p className="text-sm text-slate-500">{item.section}</p>
+                  <div>
+                    <h3 className="text-base font-semibold text-slate-900">
+                      {item.category}
+                    </h3>
+
+                    <p className="mt-0.5 text-sm text-slate-500">
+                      {item.section}
+                    </p>
+                  </div>
                 </div>
 
-                <div className="rounded-xl bg-red-50 px-3 py-2 text-right">
-                  <p className="text-xs text-slate-500">Priority Score</p>
-
-                  <p className="text-lg font-bold text-red-600">
-                    {item.priority_score}
-                  </p>
+                <div className="rounded-full bg-red-50 px-3 py-1">
+                  <span className="text-sm font-semibold text-red-600">
+                    Score {item.priority_score}
+                  </span>
                 </div>
               </div>
 
               {/* Progress */}
-              <div className="mb-4 h-2 overflow-hidden rounded-full bg-slate-100">
+              <div className="mb-4 h-1.5 overflow-hidden rounded-full bg-slate-100">
                 <div
-                  className="h-full rounded-full bg-red-500 transition-all"
+                  className="h-full rounded-full bg-red-500 transition-all duration-300"
                   style={{
                     width: `${percentage}%`,
                   }}
@@ -86,39 +93,35 @@ export function NeedAttentionCard({ items }: Props) {
               </div>
 
               {/* Statistics */}
-              <div className="grid grid-cols-3 gap-3">
-                <div className="rounded-xl bg-red-50 p-3">
-                  <div className="mb-1 flex items-center gap-2">
-                    <ShieldAlert size={15} className="text-red-600" />
+              <div className="flex flex-wrap items-center gap-6 text-sm">
+                <div className="flex items-center gap-2">
+                  <ShieldAlert className="h-4 w-4 text-red-500" />
 
-                    <span className="text-xs text-slate-500">Poor</span>
-                  </div>
+                  <span className="text-slate-500">Poor</span>
 
-                  <p className="text-lg font-bold text-red-600">{item.poor}</p>
+                  <span className="font-semibold text-slate-900">
+                    {item.poor}
+                  </span>
                 </div>
 
-                <div className="rounded-xl bg-amber-50 p-3">
-                  <div className="mb-1 flex items-center gap-2">
-                    <CircleAlert size={15} className="text-amber-600" />
+                <div className="flex items-center gap-2">
+                  <CircleAlert className="h-4 w-4 text-amber-500" />
 
-                    <span className="text-xs text-slate-500">Warning</span>
-                  </div>
+                  <span className="text-slate-500">Warning</span>
 
-                  <p className="text-lg font-bold text-amber-600">
+                  <span className="font-semibold text-slate-900">
                     {item.warning}
-                  </p>
+                  </span>
                 </div>
 
-                <div className="rounded-xl bg-green-50 p-3">
-                  <div className="mb-1 flex items-center gap-2">
-                    <span className="h-3 w-3 rounded-full bg-green-500" />
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-500" />
 
-                    <span className="text-xs text-slate-500">Good</span>
-                  </div>
+                  <span className="text-slate-500">Good</span>
 
-                  <p className="text-lg font-bold text-green-600">
+                  <span className="font-semibold text-slate-900">
                     {item.good}
-                  </p>
+                  </span>
                 </div>
               </div>
             </div>

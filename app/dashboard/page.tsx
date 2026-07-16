@@ -8,7 +8,7 @@ import { RecentActivityFeed } from "@/components/dashboard/recent-visits";
 import { RecentPhotosCard } from "@/components/dashboard/recent-photos-card";
 import { RecentNotesCard } from "@/components/dashboard/recent-notes-card";
 import { TopVisitors } from "@/components/dashboard/top-visitors/top-visitors";
-import { NeedAttentionCard } from "@/components/dashboard/need-attention-card";
+import NeedAttentionAmaCard from "@/components/dashboard/need-attention-ama-card";
 
 import {
   getDashboardSummary,
@@ -16,7 +16,7 @@ import {
   getDashboardRecentPhotos,
   getDashboardRecentNotes,
   getTopVisitors,
-  getNeedAttention,
+  getNeedAttentionByAma,
 } from "@/services/dashboard.service";
 
 export default async function DashboardPage() {
@@ -26,14 +26,14 @@ export default async function DashboardPage() {
     recentPhotos,
     recentNotes,
     topVisitors,
-    needAttention,
+    needAttentionAma,
   ] = await Promise.all([
     getDashboardSummary(),
     getRecentActivities(),
     getDashboardRecentPhotos(),
     getDashboardRecentNotes(),
     getTopVisitors(),
-    getNeedAttention(),
+    getNeedAttentionByAma(),
   ]);
 
   return (
@@ -42,26 +42,26 @@ export default async function DashboardPage() {
         {/* Summary */}
         <DashboardSummary summary={summary} />
 
-        {/* Recent Notes & Activity */}
-        <div className="grid gap-6 xl:grid-cols-2">
-          <RecentNotesCard notes={recentNotes} />
-
-          <RecentActivityFeed activities={recentActivities} />
-        </div>
-
-        {/* Recent Photos */}
-        <RecentPhotosCard photos={recentPhotos} />
-
-        {/* Need Attention & Top Visitors */}
+        {/* Priority Section */}
         <div className="grid gap-6 xl:grid-cols-12">
           <div className="xl:col-span-8">
-            <NeedAttentionCard items={needAttention} />
+            <NeedAttentionAmaCard items={needAttentionAma} />
           </div>
 
           <div className="xl:col-span-4">
             <TopVisitors visitors={topVisitors} />
           </div>
         </div>
+
+        {/* Operational */}
+        <div className="grid gap-6 xl:grid-cols-2">
+          <RecentNotesCard notes={recentNotes} />
+
+          <RecentActivityFeed activities={recentActivities} />
+        </div>
+
+        {/* Documentation */}
+        <RecentPhotosCard photos={recentPhotos} />
       </div>
     </DashboardLayout>
   );
