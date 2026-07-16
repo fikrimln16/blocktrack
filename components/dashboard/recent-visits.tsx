@@ -1,149 +1,159 @@
-const visits = [
-  {
-    id: 1,
-    employee: "Fikri Maulana",
-    ama: "AMA-001",
-    estate: "Estate Timur",
-    block: "B12",
-    time: "08:15 WIB",
-    status: "Completed",
+"use client";
 
-    avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+import Link from "next/link";
+import {
+  Activity,
+  ArrowRight,
+  CalendarDays,
+  MapPin,
+  User,
+  CheckCircle2,
+  Clock3,
+} from "lucide-react";
 
-    photo: "https://images.unsplash.com/photo-1500382017468-9049fed747ef",
-  },
-  {
-    id: 2,
-    employee: "Aldi Kurniawan",
-    ama: "AMA-002",
-    estate: "Estate Barat",
-    block: "D04",
-    time: "08:40 WIB",
-    status: "On Progress",
+interface RecentActivity {
+  id: number;
+  visit_code: string;
 
-    avatar: "https://randomuser.me/api/portraits/men/44.jpg",
+  inspector: string;
 
-    photo: "https://images.unsplash.com/photo-1464226184884-fa280b87c399",
-  },
-  {
-    id: 3,
-    employee: "Denis Saputra",
-    ama: "AMA-003",
-    estate: "Estate Selatan",
-    block: "A07",
-    time: "09:10 WIB",
-    status: "Completed",
+  ama: string;
+  estate: string;
 
-    avatar: "https://randomuser.me/api/portraits/men/68.jpg",
+  block: string;
+  block_code: string;
 
-    photo: "https://images.unsplash.com/photo-1472396961693-142e6e269027",
-  },
-];
+  visit_date: string;
+  visit_time: string;
 
-export function RecentVisits() {
+  status: string;
+}
+
+interface Props {
+  activities: RecentActivity[];
+}
+
+export function RecentActivityFeed({ activities }: Props) {
   return (
-    <div
-      className="
-        rounded-[28px]
-        border border-slate-200
-        bg-white
-        shadow-sm
-      "
-    >
-      <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5">
-        <div>
-          <h3 className="text-lg font-semibold text-slate-900">
-            Recent Activity
-          </h3>
+    <section className="flex h-[520px] flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+      {/* Header */}
+      <div className="flex items-center justify-between border-b border-slate-200 p-6">
+        <div className="flex items-center gap-4">
+          <div className="rounded-2xl bg-blue-100 p-3">
+            <Activity className="h-6 w-6 text-blue-600" />
+          </div>
 
-          <p className="text-sm text-slate-500">Latest field visits</p>
+          <div>
+            <h2 className="text-xl font-semibold text-slate-900">
+              Recent Activity
+            </h2>
+
+            <p className="mt-1 text-sm text-slate-500">
+              Latest inspection activities.
+            </p>
+          </div>
         </div>
 
-        <button className="text-sm font-medium text-blue-600">View All</button>
+        <Link
+          href="/visits"
+          className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+        >
+          View All
+          <ArrowRight size={16} />
+        </Link>
       </div>
 
-      <div className="divide-y divide-slate-100">
-        {visits.map((visit) => (
-          <div
-            key={visit.id}
-            className="
-              px-6 py-5
-              transition-colors
-              hover:bg-slate-50
-            "
-          >
-            <div className="flex items-center gap-4">
-              {/* Avatar */}
+      {/* Body */}
+      <div className="flex-1 overflow-y-auto divide-y divide-slate-100">
+        {activities.length === 0 ? (
+          <div className="flex h-full flex-col items-center justify-center">
+            <Activity className="mb-4 h-12 w-12 text-slate-300" />
 
-              <img
-                src={visit.avatar}
-                alt={visit.employee}
-                className="
-                  h-12
-                  w-12
-                  flex-shrink-0
-                  rounded-full
-                  object-cover
-                  border-2
-                  border-white
-                  shadow-sm
-                "
-              />
+            <h3 className="text-lg font-semibold text-slate-700">
+              No Recent Activity
+            </h3>
 
-              {/* Content */}
+            <p className="mt-2 text-sm text-slate-500">
+              No recent inspections.
+            </p>
+          </div>
+        ) : (
+          activities.map((activity) => (
+            <div
+              key={activity.id}
+              className="group flex min-h-[150px] flex-col justify-between p-6 transition hover:bg-slate-50"
+            >
+              <div>
+                <div className="mb-3 flex flex-wrap items-center gap-3">
+                  <span className="rounded-lg bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600">
+                    {activity.visit_code}
+                  </span>
 
-              <div className="min-w-0 flex-1">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h4 className="font-semibold leading-none text-slate-900">
-                      {visit.employee}
-                    </h4>
-
-                    <p className="mt-1 text-sm text-slate-500">
-                      {visit.ama} • {visit.estate} • Block {visit.block}
-                    </p>
+                  <div className="flex items-center gap-1 text-sm text-slate-500">
+                    <CalendarDays size={14} />
+                    {activity.visit_date} • {activity.visit_time}
                   </div>
 
-                  {/* Visit Photo */}
-
-                  <img
-                    src={visit.photo}
-                    alt="Visit"
-                    className="
-                      h-12
-                      w-12
-                      rounded-lg
-                      object-cover
-                      border
-                      border-slate-200
-                    "
-                  />
-                </div>
-
-                <div className="mt-1 flex items-center gap-2">
-                  <span className="text-xs text-slate-500">{visit.time}</span>
-
                   <span
-                    className={`
-                      rounded-full
-                      px-2 py-0.5
-                      text-[11px]
-                      font-medium
-                      ${
-                        visit.status === "Completed"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-orange-100 text-orange-700"
-                      }
-                    `}
+                    className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium ${
+                      activity.status === "Completed"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-amber-100 text-amber-700"
+                    }`}
                   >
-                    {visit.status}
+                    {activity.status === "Completed" ? (
+                      <CheckCircle2 size={13} />
+                    ) : (
+                      <Clock3 size={13} />
+                    )}
+
+                    {activity.status}
                   </span>
                 </div>
+
+                <div className="mb-2 flex flex-wrap items-center gap-5">
+                  <div className="flex items-center gap-2 text-sm font-medium text-slate-700">
+                    <User size={15} />
+
+                    {activity.inspector}
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2 text-sm text-slate-500">
+                    <MapPin size={15} />
+
+                    <span>{activity.ama}</span>
+
+                    <span>•</span>
+
+                    <span>{activity.estate}</span>
+
+                    <span>•</span>
+
+                    <span>{activity.block_code}</span>
+
+                    <span>({activity.block})</span>
+                  </div>
+                </div>
+
+                <p className="line-clamp-2 text-sm leading-6 text-slate-600">
+                  Inspection activity has been completed and recorded for this
+                  block.
+                </p>
+              </div>
+
+              <div className="mt-4">
+                <Link
+                  href={`/visits/${activity.id}`}
+                  className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
+                >
+                  Detail
+                  <ArrowRight size={16} />
+                </Link>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
-    </div>
+    </section>
   );
 }

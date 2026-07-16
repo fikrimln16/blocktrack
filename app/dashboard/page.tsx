@@ -4,38 +4,43 @@ export const revalidate = 0;
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 
 import { DashboardSummary } from "@/components/dashboard/summary/dashboard-summary";
-import { DashboardStatistics } from "@/components/dashboard/statistics/dashboard-statistic";
-import { TopVisitors } from "@/components/dashboard/top-visitors/top-visitors";
 import { RecentActivityFeed } from "@/components/dashboard/recent-activity/recent-activity";
+import { RecentPhotosCard } from "@/components/dashboard/recent-photos-card";
+import { RecentNotesCard } from "@/components/dashboard/recent-notes-card";
 
 import {
   getDashboardSummary,
-  getDashboardStatistics,
-  getTopVisitors,
   getRecentActivities,
+  getDashboardRecentPhotos,
+  getDashboardRecentNotes,
 } from "@/services/dashboard.service";
 
 export default async function DashboardPage() {
-  const [summary, statistics, topVisitors, recentActivities] =
+  const [summary, recentActivities, recentPhotos, recentNotes] =
     await Promise.all([
       getDashboardSummary(),
-      getDashboardStatistics(),
-      getTopVisitors(),
       getRecentActivities(),
+      getDashboardRecentPhotos(),
+      getDashboardRecentNotes(),
     ]);
 
   return (
     <DashboardLayout>
       <div className="space-y-8">
+        {/* Summary */}
         <DashboardSummary summary={summary} />
 
-        <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2">
-            <RecentActivityFeed activities={recentActivities} />
-          </div>
+        {/* Notes & Activity */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          <RecentNotesCard notes={recentNotes} />
 
-          <TopVisitors visitors={topVisitors} />
+          <RecentActivityFeed activities={recentActivities} />
         </div>
+
+        {/* Recent Photos */}
+        <RecentPhotosCard photos={recentPhotos} />
+
+        {/* Top Visitors (Coming Next) */}
       </div>
     </DashboardLayout>
   );
