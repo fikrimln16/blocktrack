@@ -7,22 +7,34 @@ import { DashboardSummary } from "@/components/dashboard/summary/dashboard-summa
 import { RecentActivityFeed } from "@/components/dashboard/recent-visits";
 import { RecentPhotosCard } from "@/components/dashboard/recent-photos-card";
 import { RecentNotesCard } from "@/components/dashboard/recent-notes-card";
+import { TopVisitors } from "@/components/dashboard/top-visitors/top-visitors";
+import { NeedAttentionCard } from "@/components/dashboard/need-attention-card";
 
 import {
   getDashboardSummary,
   getRecentActivities,
   getDashboardRecentPhotos,
   getDashboardRecentNotes,
+  getTopVisitors,
+  getNeedAttention,
 } from "@/services/dashboard.service";
 
 export default async function DashboardPage() {
-  const [summary, recentActivities, recentPhotos, recentNotes] =
-    await Promise.all([
-      getDashboardSummary(),
-      getRecentActivities(),
-      getDashboardRecentPhotos(),
-      getDashboardRecentNotes(),
-    ]);
+  const [
+    summary,
+    recentActivities,
+    recentPhotos,
+    recentNotes,
+    topVisitors,
+    needAttention,
+  ] = await Promise.all([
+    getDashboardSummary(),
+    getRecentActivities(),
+    getDashboardRecentPhotos(),
+    getDashboardRecentNotes(),
+    getTopVisitors(),
+    getNeedAttention(),
+  ]);
 
   return (
     <DashboardLayout>
@@ -30,8 +42,8 @@ export default async function DashboardPage() {
         {/* Summary */}
         <DashboardSummary summary={summary} />
 
-        {/* Notes & Activity */}
-        <div className="grid gap-6 lg:grid-cols-2">
+        {/* Recent Notes & Activity */}
+        <div className="grid gap-6 xl:grid-cols-2">
           <RecentNotesCard notes={recentNotes} />
 
           <RecentActivityFeed activities={recentActivities} />
@@ -40,7 +52,16 @@ export default async function DashboardPage() {
         {/* Recent Photos */}
         <RecentPhotosCard photos={recentPhotos} />
 
-        {/* Top Visitors (Coming Next) */}
+        {/* Need Attention & Top Visitors */}
+        <div className="grid gap-6 xl:grid-cols-12">
+          <div className="xl:col-span-8">
+            <NeedAttentionCard items={needAttention} />
+          </div>
+
+          <div className="xl:col-span-4">
+            <TopVisitors visitors={topVisitors} />
+          </div>
+        </div>
       </div>
     </DashboardLayout>
   );

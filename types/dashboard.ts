@@ -57,3 +57,14 @@ export interface RecentActivity {
 
   status: string;
 }
+
+export interface NeedAttention {
+  category: string;
+  section: string;
+
+  poor: number;
+  warning: number;
+  good: number;
+
+  priority_score: number;
+}
