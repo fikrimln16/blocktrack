@@ -16,7 +16,7 @@ async function run() {
 
     console.log("✅ Connected MySQL");
 
-    const filePath = path.join(__dirname, "../geojson/blok.geojson");
+    const filePath = path.join(__dirname, "../geojson/block_new.geojson");
 
     const raw = fs.readFileSync(filePath, "utf8");
 
@@ -122,51 +122,132 @@ async function run() {
       // BLOCK
       //-----------------------------------
 
+      //-----------------------------------
+      // BLOCK
+      //-----------------------------------
+
       await db.execute(
         `
-        INSERT INTO blocks
-        (
-          estate_id,
+  INSERT INTO blocks
+  (
+    estate_id,
 
-          block_code,
+    block_code,
 
-          status,
+    status,
 
-          division,
+    division,
 
-          planting_year,
+    planting_year,
 
-          area_ha,
+    area_ha,
 
-          geometry
-        )
+    unit,
 
-        VALUES
-        (
-          ?, ?, ?, ?, ?, ?, ?
-        )
+    ba_initial,
 
-        ON DUPLICATE KEY UPDATE
+    total_trees,
 
-          status = VALUES(status),
-          division = VALUES(division),
-          planting_year = VALUES(planting_year),
-          area_ha = VALUES(area_ha),
-          geometry = VALUES(geometry)
-        `,
+    sph,
+
+    productive_year,
+
+    topography,
+
+    soil_type,
+
+    ytd_yield,
+
+    shape_area,
+
+    shape_length,
+
+    remarks,
+
+    geometry
+  )
+
+  VALUES
+  (
+    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+  )
+
+  ON DUPLICATE KEY UPDATE
+
+    status = VALUES(status),
+
+    division = VALUES(division),
+
+    planting_year = VALUES(planting_year),
+
+    area_ha = VALUES(area_ha),
+
+    unit = VALUES(unit),
+
+    ba_initial = VALUES(ba_initial),
+
+    total_trees = VALUES(total_trees),
+
+    sph = VALUES(sph),
+
+    productive_year = VALUES(productive_year),
+
+    topography = VALUES(topography),
+
+    soil_type = VALUES(soil_type),
+
+    ytd_yield = VALUES(ytd_yield),
+
+    shape_area = VALUES(shape_area),
+
+    shape_length = VALUES(shape_length),
+
+    remarks = VALUES(remarks),
+
+    geometry = VALUES(geometry)
+  `,
         [
           estateId,
 
-          String(p.BlockCode).trim(),
+          // Block
+          String(p.BlockCode ?? "").trim(),
 
+          // Existing
           p.STATUS ?? null,
 
-          p.DIVISI ? Number(p.DIVISI) : null,
+          p.DIVISI != null ? Number(p.DIVISI) : null,
 
           p.PYEAR && Number(p.PYEAR) > 0 ? Number(p.PYEAR) : null,
 
-          p.HA ? Number(p.HA) : 0,
+          p.HA != null ? Number(p.HA) : 0,
 
+          // ============================
+          // New Fields
+          // ============================
+
+          p.Unit ?? null,
+
+          p.BAInitial ?? null,
+
+          p.Trees != null ? Number(p.Trees) : 0,
+
+          p.SPH != null ? Number(p.SPH) : 0,
+
+          p.PY != null ? Number(p.PY) : 0,
+
+          p.Topography ?? null,
+
+          p.Soil_Type ?? null,
+
+          p.YTD != null ? Number(p.YTD) : 0,
+
+          p.Shape_STAr != null ? Number(p.Shape_STAr) : null,
+
+          p.Shape_STLe != null ? Number(p.Shape_STLe) : null,
+
+          p.KET ?? null,
+
+          // Geometry
           JSON.stringify(feature.geometry),
         ],
       );
