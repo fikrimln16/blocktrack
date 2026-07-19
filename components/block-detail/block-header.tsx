@@ -150,66 +150,114 @@ export function BlockHeader({ block }: Props) {
 
         {/* Bottom Information */}
 
-        <div className="grid gap-6 bg-slate-50 p-8 md:grid-cols-2 xl:grid-cols-6">
-          <InfoCard
-            icon={<Landmark size={18} />}
-            title="AMA"
-            value={block.ama}
-          />
+        {/* ================= Block Information ================= */}
 
-          <InfoCard
-            icon={<Building2 size={18} />}
-            title="Estate"
-            value={block.estate}
-          />
+        <div className="border-t border-slate-200 bg-slate-50 px-8 py-7">
+          <div className="mb-6 flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
+              <MapPinned size={20} />
+            </div>
 
-          <InfoCard
-            icon={<Map size={18} />}
-            title="Division"
-            value={`Division ${block.division}`}
-          />
+            <div>
+              <h3 className="text-lg font-semibold text-slate-900">
+                Block Information
+              </h3>
 
-          <InfoCard
-            icon={<Trees size={18} />}
-            title="Area"
-            value={`${Number(block.area_ha).toFixed(2)} Ha`}
-          />
+              <p className="text-sm text-slate-500">
+                General information about this plantation block.
+              </p>
+            </div>
+          </div>
 
-          <InfoCard
-            icon={<Calendar size={18} />}
-            title="Planting Year"
-            value={block.planting_year || "-"}
-          />
+          <div className="grid gap-x-12 gap-y-6 md:grid-cols-2 xl:grid-cols-3">
+            <InfoItem
+              icon={<Landmark size={18} />}
+              label="AMA"
+              value={block.ama}
+            />
 
-          <InfoCard
-            icon={<BadgeCheck size={18} />}
-            title="BA Code"
-            value={block.ba_code || "-"}
-          />
+            <InfoItem
+              icon={<Building2 size={18} />}
+              label="Estate"
+              value={block.estate}
+            />
+
+            <InfoItem
+              icon={<Map size={18} />}
+              label="Division"
+              value={block.division ? `Division ${block.division}` : "-"}
+            />
+
+            <InfoItem
+              icon={<Calendar size={18} />}
+              label="Planting Year"
+              value={block.planting_year ?? "-"}
+            />
+
+            <InfoItem
+              icon={<MapPinned size={18} />}
+              label="Topography"
+              value={block.topography ?? "-"}
+            />
+
+            <InfoItem
+              icon={<MapPinned size={18} />}
+              label="Soil Type"
+              value={block.soil_type ?? "-"}
+            />
+
+            <InfoItem
+              icon={<Trees size={18} />}
+              label="Area"
+              value={
+                block.area_ha ? `${Number(block.area_ha).toFixed(2)} Ha` : "-"
+              }
+            />
+
+            <InfoItem
+              icon={<Trees size={18} />}
+              label="SPH"
+              value={block.sph ? Number(block.sph).toLocaleString() : "-"}
+            />
+
+            <InfoItem
+              icon={<BadgeCheck size={18} />}
+              label="YTD Yield"
+              value={
+                block.ytd_yield
+                  ? `${Number(block.ytd_yield).toFixed(2)} Ton/Ha`
+                  : "-"
+              }
+            />
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-interface InfoCardProps {
+interface InfoItemProps {
   icon: React.ReactNode;
-  title: string;
+  label: string;
   value: string | number;
 }
 
-function InfoCard({ icon, title, value }: InfoCardProps) {
+function InfoItem({ icon, label, value }: InfoItemProps) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 transition hover:shadow-md">
-      <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+    <div className="flex items-start gap-4">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-blue-600 shadow-sm ring-1 ring-slate-200">
         {icon}
       </div>
 
-      <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-        {title}
-      </p>
+      <div className="min-w-0">
+        <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+          {label}
+        </p>
 
-      <p className="mt-2 text-lg font-bold text-slate-900">{value}</p>
+        <p className="mt-1 text-base font-semibold text-slate-900 break-words">
+          {value}
+        </p>
+      </div>
     </div>
   );
 }

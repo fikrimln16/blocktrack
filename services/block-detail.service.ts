@@ -11,6 +11,12 @@ export async function getBlockDetail(id: number) {
       b.division,
       b.area_ha,
       b.planting_year,
+
+      b.topography,
+      b.soil_type,
+      b.sph,
+      b.ytd_yield,
+
       b.ba_code,
       b.ba_initial,
       b.unit,
@@ -191,6 +197,12 @@ export async function getBlockDetail(id: number) {
       b.division,
       b.area_ha,
       b.planting_year,
+
+      b.topography,
+      b.soil_type,
+      b.sph,
+      b.ytd_yield,
+
       b.ba_code,
       b.ba_initial,
       b.unit,
