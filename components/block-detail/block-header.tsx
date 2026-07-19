@@ -222,7 +222,7 @@ export function BlockHeader({ block }: Props) {
 
             <InfoItem
               icon={<BadgeCheck size={18} />}
-              label="YTD Yield"
+              label="YTD"
               value={
                 block.ytd_yield
                   ? `${Number(block.ytd_yield).toFixed(2)} Ton/Ha`
